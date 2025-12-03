@@ -38,7 +38,7 @@ Thumbs.db
 *.iml
 
 # File generati da npm (se usi npm v7+)
-package-lock.json
+# package-lock.json
 
 # Vite JS per la cache
 /node_modules/.vite
