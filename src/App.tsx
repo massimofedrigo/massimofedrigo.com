@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { Github, Linkedin, Mail, ExternalLink, Terminal, Cpu, Shield, Globe, ChevronDown, Code2, BookOpen, Network } from 'lucide-react';
+// MODIFICA: Aggiunto FileText per l'icona del CV
+import { Github, Linkedin, Mail, ExternalLink, Terminal, Cpu, Shield, Globe, ChevronDown, Code2, BookOpen, Network, FileText } from 'lucide-react';
 
-// --- DATI PERSONALI (I tuoi dati) ---
+// --- DATI PERSONALI ---
 const portfolioData = {
   name: "Massimo Fedrigo",
-  role: "Software Engineer & Computer Scientist",
+  // role: Rimosso da qui perché ora è gestito dall'effetto macchina da scrivere
   location: "Cordenons, PN (Italy)",
   bio: "Sviluppo architetture software scalabili e studio la matematica dietro gli algoritmi complessi. Attualmente focalizzato su Computational Modelling e Cybersecurity Offensiva.",
   social: {
@@ -106,6 +107,54 @@ const GradientText = ({ children, className = "" }) => (
   </span>
 );
 
+// --- NUOVO COMPONENTE: Typewriter Effect ---
+const TypewriterEffect = ({ words }: { words: string[] }) => {
+  const [index, setIndex] = useState(0);
+  const [subIndex, setSubIndex] = useState(0);
+  const [reverse, setReverse] = useState(false);
+  const [blink, setBlink] = useState(true);
+
+  // Cursore lampeggiante
+  useEffect(() => {
+    const timeout2 = setTimeout(() => {
+      setBlink((prev) => !prev);
+    }, 500);
+    return () => clearTimeout(timeout2);
+  }, [blink]);
+
+  // Logica di scrittura/cancellazione
+  useEffect(() => {
+    if (index >= words.length) {
+        setIndex(0);
+        return;
+    }
+
+    if (subIndex === words[index].length + 1 && !reverse) {
+      setTimeout(() => setReverse(true), 1500); // Pausa alla fine della parola
+      return;
+    }
+
+    if (subIndex === 0 && reverse) {
+      setReverse(false);
+      setIndex((prev) => (prev + 1) % words.length); // Passa alla prossima parola
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      setSubIndex((prev) => prev + (reverse ? -1 : 1));
+    }, reverse ? 50 : 100);
+
+    return () => clearTimeout(timeout);
+  }, [subIndex, index, reverse, words]);
+
+  return (
+    <span className="text-slate-200">
+      {words[index].substring(0, subIndex)}
+      <span className={`${blink ? "opacity-100" : "opacity-0"} text-violet-500 font-bold ml-1`}>|</span>
+    </span>
+  );
+};
+
 export default function Portfolio() {
   const { scrollYProgress } = useScroll();
   const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
@@ -114,7 +163,7 @@ export default function Portfolio() {
   // Background blobs animation
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   useEffect(() => {
-    const handleMouseMove = (e) => setMousePosition({ x: e.clientX, y: e.clientY });
+    const handleMouseMove = (e: MouseEvent) => setMousePosition({ x: e.clientX, y: e.clientY });
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
@@ -138,10 +187,9 @@ export default function Portfolio() {
 
       {/* NAVBAR */}
       <nav className="fixed top-0 w-full z-50 px-6 py-6 flex justify-between items-center max-w-7xl mx-auto left-0 right-0">
-        <a href="#" className="bg-white/5 p-2 rounded-full border border-white/5 backdrop-blur-md hover:bg-white/10 transition-colors shadow-lg shadow-violet-500/10">
-          <img src="/favicon.svg" alt="MF Logo" className="w-8 h-8" />
-        </a>
-
+        <div className="text-xl font-bold tracking-tight text-white bg-white/5 px-4 py-2 rounded-full border border-white/5 backdrop-blur-md">
+          MF<span className="text-violet-500">.</span>
+        </div>
         <div className="flex gap-4">
           <a href={portfolioData.social.github} target="_blank" className="p-2 bg-white/5 rounded-full hover:bg-white/10 hover:text-white transition-colors border border-white/5"><Github size={20}/></a>
           <a href={portfolioData.social.linkedin} target="_blank" className="p-2 bg-white/5 rounded-full hover:bg-white/10 hover:text-white transition-colors border border-white/5"><Linkedin size={20}/></a>
@@ -151,7 +199,7 @@ export default function Portfolio() {
 
       {/* HERO SECTION */}
       <Section className="min-h-screen flex flex-col justify-center items-center text-center pt-20">
-        <motion.div style={{ opacity, scale }} className="space-y-8 max-w-3xl">
+        <motion.div style={{ opacity, scale }} className="space-y-8 max-w-3xl flex flex-col items-center">
           <motion.div 
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}
             className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-950/30 border border-violet-500/30 text-violet-300 text-xs font-medium tracking-wider uppercase mb-4"
@@ -168,11 +216,20 @@ export default function Portfolio() {
             <GradientText>Fedrigo</GradientText>
           </motion.h1>
 
+          {/* MODIFICA: Typewriter Effect al posto del testo statico */}
+          <div className="text-lg md:text-2xl text-slate-400 h-8">
+            <TypewriterEffect words={[
+              "Computer Scientist", 
+              "Software Engineer", 
+              "Cybersecurity Enthusiast", 
+              "Math Geek"
+            ]} />
+          </div>
+
           <motion.p 
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed"
+            className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed mt-4"
           >
-            Computer Scientist & Software Engineer. <br className="hidden md:block"/>
             Trasformo complessi problemi matematici in <span className="text-white font-medium">software elegante e sicuro</span>.
           </motion.p>
           
@@ -183,18 +240,24 @@ export default function Portfolio() {
              <a href="#projects" className="px-8 py-4 bg-white text-black font-bold rounded-full hover:scale-105 transition-transform">
                Vedi Progetti
              </a>
-             <a href="#about" className="px-8 py-4 bg-white/5 border border-white/10 text-white rounded-full hover:bg-white/10 transition-colors backdrop-blur-md">
-               About Me
+             
+             {/* MODIFICA: Bottone Download CV in stile Viola */}
+             <a 
+               href="/cv.pdf" 
+               download
+               className="px-8 py-4 bg-violet-600 hover:bg-violet-500 text-white font-bold rounded-full hover:scale-105 transition-transform flex items-center gap-2 shadow-lg shadow-violet-900/20"
+             >
+               <FileText size={20} /> Scarica CV
              </a>
           </motion.div>
         </motion.div>
         
-        {/* MODIFICA QUI: Aggiunto tag <a> attorno all'icona */}
         <motion.div 
           animate={{ y: [0, 10, 0] }} transition={{ repeat: Infinity, duration: 2 }}
           className="absolute bottom-10 text-slate-500"
         >
-          <a href="#stack" className="cursor-pointer hover:text-white transition-colors" aria-label="Scroll to stack">
+          {/* Aggiunto anchor link per navigazione base */}
+          <a href="#stack" className="cursor-pointer hover:text-white transition-colors">
             <ChevronDown size={24} />
           </a>
         </motion.div>
