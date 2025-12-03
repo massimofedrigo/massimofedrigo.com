@@ -1,10 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="16" fill="#030014"/>
-  
-  <rect x="2" y="2" width="60" height="60" rx="14" stroke="#e11d48" stroke-width="2" fill="none"/>
-
-  <path d="M22 24 L14 32 L22 40" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M42 24 L50 32 L42 40" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  
-  <line x1="35" y1="16" x2="29" y2="48" stroke="#e11d48" stroke-width="5" stroke-linecap="round" />
+  <g transform="translate(4, 48)">
+    <text 
+      x="0" 
+      y="0" 
+      font-family="monospace" 
+      font-weight="900" 
+      font-size="48" 
+      fill="#22c55e" 
+    >_</text>
+    
+    <text 
+      x="28" 
+      y="0" 
+      font-family="monospace" 
+      font-weight="900" 
+      font-size="48" 
+      fill="#22c55e" 
+    >&gt;</text>
+  </g>
 </svg>

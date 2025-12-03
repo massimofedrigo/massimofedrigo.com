@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { Github, Linkedin, Mail, ExternalLink, Cpu, Shield, Globe, ChevronDown, BookOpen, Network } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Github, Linkedin, Mail, ExternalLink, Terminal, Shield, Cpu, Globe, Network, BookOpen, ChevronRight, Hash, Command } from 'lucide-react';
 
-// --- DATI PERSONALI ---
+// --- DATI ---
 const portfolioData = {
   name: "Massimo Fedrigo",
-  role: "Software Engineer & Computer Scientist",
+  role: "Software Engineer & Security Researcher",
   location: "Cordenons, PN (Italy)",
-  bio: "Sviluppo architetture software scalabili e studio la matematica dietro gli algoritmi complessi. Attualmente focalizzato su Computational Modelling e Cybersecurity Offensiva.",
   social: {
     github: "https://github.com/massimofedrigo",
     linkedin: "https://www.linkedin.com/in/massimo-fedrigo-33424228a/",
@@ -16,343 +15,300 @@ const portfolioData = {
 };
 
 const skills = [
-  { name: "Python", level: 95 }, { name: "Java", level: 90 }, 
-  { name: "React / Vue", level: 85 }, { name: "Flutter", level: 85 },
-  { name: "Node.js", level: 80 }, { name: "Symfony", level: 80 },
-  { name: "C / C++", level: 75 }, { name: "Cybersecurity (OSCP)", level: 70 }
+  "Python", "C/C++", "Assembly x86", "Bash/Shell", 
+  "React", "Node.js", "Cryptography", "Network Security", "OSCP Prep"
 ];
 
 const projects = [
   {
-    title: "Overdiet",
-    desc: "Piattaforma Web & Mobile multiutente per la gestione di piani alimentari automatizzati.",
-    tech: ["PHP", "Symfony", "Javascript", "Node.js", "VUE.js", "Dart", "Flutter"],
-    link: "https://overdiet.com",
-    icon: <Cpu className="text-rose-400" />
-  },
-  {
-    title: "Stradella Fitness",
-    desc: "Piattaforma Web & Mobile monoutente per la gestione di piani alimentari automatizzati.",
-    tech: ["PHP", "Symfony", "Javascript", "Node.js", "VUE.js", "Dart", "Flutter"],
-    link: "https://stradellafitness.com",
-    icon: <Cpu className="text-rose-400" />
-  },
-  {
-    title: "Synthetic Pages",
-    desc: "Generatore automatizzato di siti statici basato su LLM e trend di ricerca Google.",
-    tech: ["Python", "Jinja2", "OpenAI API"],
+    title: "Synthetic_Pages",
+    type: "AI / Automation",
+    desc: "Automated static site generator via LLM & Google Trends analysis.",
     link: "https://github.com/massimofedrigo/synthetic-pages",
-    icon: <Globe className="text-rose-400" />
+    icon: <Globe size={18} />
   },
   {
     title: "Cyphermesh",
-    desc: "Rete P2P decentralizzata per la condivisione di Threat Intelligence con trust system.",
-    tech: ["Python", "Flask", "C", "P2P"],
+    type: "P2P / Security",
+    desc: "Decentralized P2P threat intelligence sharing network.",
     link: "https://github.com/massimofedrigo/cyphermesh",
-    icon: <Network className="text-rose-400" />
+    icon: <Network size={18} />
   },
   {
-    title: "Algowiki.dev",
-    desc: "Enciclopedia didattica di algoritmi con analisi di complessità e dimostrazioni.",
-    tech: ["Markdown", "Mkdocs", "MathJax"],
+    title: "AlgoWiki",
+    type: "Education / CS",
+    desc: "Algorithm encyclopedia with complexity analysis.",
     link: "https://algowiki.dev",
-    icon: <BookOpen className="text-rose-400" />
+    icon: <BookOpen size={18} />
+  },
+  {
+    title: "Overdiet_Platform",
+    type: "Full Stack",
+    desc: "Complex web/mobile ecosystem for diet management.",
+    link: "https://overdiet.com",
+    icon: <Cpu size={18} />
   }
 ];
 
-const experience = [
-  {
-    year: "2023 - Presente",
-    role: "Full Stack Developer Freelance",
-    company: "Progetti Vari",
-    desc: "Sviluppo di piattaforme complesse come Overdiet e Stradella Fitness. Migrazione legacy code, API Design e Mobile App development."
-  },
-  {
-    year: "2025 - Presente",
-    role: "MSc Computational Mathematics",
-    company: "Università di Trieste",
-    desc: "Specializzazione in ottimizzazione numerica, machine learning e modellazione stocastica."
-  },
-  {
-    year: "2021 - 2025",
-    role: "BSc Informatica",
-    company: "Università di Udine",
-    desc: "Laurea triennale. Tesi: 'Algoritmo per il calcolo randomizzato della Singular Value Decomposition (SVD)'."
-  }
-];
+// --- COMPONENTI UI HACKER ---
 
-// --- COMPONENTI UI ---
-
-const Section = ({ children, className = "", id = "" }) => (
-  <section id={id} className={`py-24 px-6 md:px-12 max-w-7xl mx-auto relative z-10 ${className}`}>
-    {children}
-  </section>
+const Scanline = () => (
+  <div className="fixed inset-0 pointer-events-none z-50 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_4px,6px_100%] opacity-20" />
 );
 
-const GlassCard = ({ children, className = "", hoverEffect = true }) => (
-  <motion.div 
-    whileHover={hoverEffect ? { y: -5, boxShadow: "0 20px 40px -10px rgba(225, 29, 72, 0.15)" } : {}}
-    className={`bg-[#11112b]/60 backdrop-blur-xl border border-white/5 p-8 rounded-3xl overflow-hidden relative ${className}`}
-  >
-    {/* Subtle gradient overlay */}
-    <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-    {children}
-  </motion.div>
-);
-
-const GradientText = ({ children, className = "" }) => (
-  <span className={`bg-clip-text text-transparent bg-gradient-to-r from-red-600 via-rose-500 to-amber-400 ${className}`}>
-    {children}
-  </span>
-);
-
-const SnowOverlay = () => {
-  const flakes = Array.from({ length: 30 });
-  return (
-    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-      {flakes.map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute bg-white rounded-full opacity-20"
-          initial={{ 
-            x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000), 
-            y: -20, 
-            opacity: 0 
-          }}
-          animate={{ 
-            y: typeof window !== 'undefined' ? window.innerHeight + 20 : 1000, 
-            opacity: [0, 0.4, 0] 
-          }}
-          transition={{ 
-            duration: 5 + Math.random() * 10, 
-            repeat: Infinity, 
-            delay: Math.random() * 5,
-            ease: "linear"
-          }}
-          style={{
-            width: Math.random() * 3 + 1,
-            height: Math.random() * 3 + 1,
-          }}
-        />
-      ))}
+const TerminalWindow = ({ children, title = "bash" }: { children: React.ReactNode, title?: string }) => (
+  <div className="w-full max-w-4xl bg-black border border-green-900 rounded-sm overflow-hidden shadow-[0_0_20px_rgba(34,197,94,0.1)] font-mono mb-12">
+    <div className="bg-green-900/20 border-b border-green-900/50 px-4 py-1 flex items-center justify-between">
+      <div className="flex gap-2">
+        <div className="w-3 h-3 rounded-full bg-red-900/50"></div>
+        <div className="w-3 h-3 rounded-full bg-yellow-900/50"></div>
+        <div className="w-3 h-3 rounded-full bg-green-900/50"></div>
+      </div>
+      <div className="text-green-700 text-xs tracking-widest uppercase select-none">{title}</div>
+      <div className="w-10"></div>
     </div>
-  );
-};
+    <div className="p-6 text-green-500">
+      {children}
+    </div>
+  </div>
+);
 
-export default function Portfolio() {
-  const { scrollYProgress } = useScroll();
-  const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
-  const scale = useTransform(scrollYProgress, [0, 0.2], [1, 0.95]);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+const Typewriter = ({ text, delay = 0 }: { text: string, delay?: number }) => {
+  const [displayedText, setDisplayedText] = useState('');
   
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => setMousePosition({ x: e.clientX, y: e.clientY });
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    let i = 0;
+    const startTimeout = setTimeout(() => {
+      const interval = setInterval(() => {
+        setDisplayedText(text.slice(0, i + 1));
+        i++;
+        if (i > text.length) clearInterval(interval);
+      }, 30); // Velocità digitazione
+      return () => clearInterval(interval);
+    }, delay * 1000);
+    return () => clearTimeout(startTimeout);
+  }, [text, delay]);
+
+  return <span>{displayedText}</span>;
+};
+
+const SectionHeader = ({ title, num }: { title: string, num: string }) => (
+  <div className="flex items-end gap-4 mb-8 border-b border-green-900/50 pb-2">
+    <span className="text-green-700 text-sm font-bold">./0{num}</span>
+    <h2 className="text-2xl md:text-3xl font-bold text-green-400 uppercase tracking-tighter">{title}</h2>
+  </div>
+);
+
+export default function Portfolio() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
   }, []);
 
+  if (!mounted) return null;
+
   return (
-    <div className="min-h-screen bg-[#030014] text-slate-300 font-sans overflow-x-hidden selection:bg-red-500/30 selection:text-white">
+    <div className="min-h-screen bg-black text-green-500 font-mono selection:bg-green-900 selection:text-white overflow-x-hidden">
+      <Scanline />
       
-      <SnowOverlay />
-
-      {/* DYNAMIC BACKGROUND */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-red-900/20 rounded-full blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-amber-900/10 rounded-full blur-[100px]" />
-        <motion.div 
-          className="absolute w-[400px] h-[400px] bg-rose-600/10 rounded-full blur-[100px]"
-          animate={{ x: mousePosition.x - 200, y: mousePosition.y - 200 }}
-          transition={{ type: "spring", damping: 30, stiffness: 50 }}
-        />
-      </div>
-
-      {/* NAVBAR */}
-      <nav className="fixed top-0 w-full z-50 px-6 py-6 flex justify-between items-center max-w-7xl mx-auto left-0 right-0">
-        <a href="#" className="bg-white/5 p-2 rounded-full border border-white/5 backdrop-blur-md hover:bg-white/10 transition-colors shadow-lg shadow-violet-500/10">
-          <img src="/favicon.svg" alt="MF Logo" className="w-8 h-8" />
-        </a>
-        <div className="flex gap-4">
-          <a href={portfolioData.social.github} target="_blank" className="p-2 bg-white/5 rounded-full hover:bg-white/10 hover:text-white transition-colors border border-white/5"><Github size={20}/></a>
-          <a href={portfolioData.social.linkedin} target="_blank" className="p-2 bg-white/5 rounded-full hover:bg-white/10 hover:text-white transition-colors border border-white/5"><Linkedin size={20}/></a>
-          <a href={portfolioData.social.mail} className="p-2 bg-rose-600/80 text-white rounded-full hover:bg-rose-500 transition-colors shadow-lg shadow-rose-500/20"><Mail size={20}/></a>
+      {/* HEADER / STATUS BAR */}
+      <nav className="fixed top-0 w-full z-40 bg-black/90 border-b border-green-900/50 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-6 h-12 flex justify-between items-center text-xs md:text-sm">
+          <div className="flex gap-4">
+            <span className="text-green-700">root@massimofedrigo:~$</span>
+            <span className="animate-pulse">_</span>
+          </div>
+          <div className="flex gap-6 opacity-70">
+            <a href="#projects" className="hover:text-white hover:underline decoration-green-500 underline-offset-4 transition-all">./PROJECTS</a>
+            <a href="#about" className="hover:text-white hover:underline decoration-green-500 underline-offset-4 transition-all">./ABOUT</a>
+            <a href="#contact" className="hover:text-white hover:underline decoration-green-500 underline-offset-4 transition-all">./CONTACT</a>
+          </div>
         </div>
       </nav>
 
-      {/* HERO SECTION */}
-      <Section className="min-h-screen flex flex-col justify-center items-center text-center pt-20 relative">
-        <motion.div style={{ opacity, scale }} className="space-y-8 max-w-3xl relative z-10 flex flex-col items-center">
-          
-          {/* BADGE DI STATO */}
-          {/* Posizionato come blocco flessibile centrato, indipendente dal titolo */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-950/80 border border-amber-500/50 text-red-100 text-sm font-bold tracking-wider uppercase mb-2 shadow-[0_0_15px_rgba(245,158,11,0.2)] backdrop-blur-md"
-          >
-            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.8)]"></span>
-            Merry Coding 🎄
-          </motion.div>
-
-          {/* CONTENITORE NOME + CAPPELLO */}
-          <div className="relative inline-block mt-4">
-            {/* Cappello di Babbo Natale */}
-            <motion.span 
-              initial={{ opacity: 0, y: -20, rotate: -20 }}
-              animate={{ opacity: 1, y: 0, rotate: -12 }}
-              transition={{ delay: 0.5, type: "spring" }}
-              className="absolute -top-7 -left-4 md:-top-10 md:-left-6 text-5xl md:text-7xl z-20 filter drop-shadow-lg pointer-events-none"
-              style={{ filter: "drop-shadow(0 0 10px rgba(255,0,0,0.5))" }}
-            >
-              🎅
-            </motion.span>
-
-            <motion.h1 
-              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.1 }}
-              className="text-6xl md:text-8xl font-bold text-white tracking-tight leading-none relative z-10"
-            >
-              Massimo <br />
-              <GradientText>Fedrigo</GradientText>
-            </motion.h1>
-          </div>
-
-          <motion.p 
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed"
-          >
-            Computer Scientist & Software Engineer. <br className="hidden md:block"/>
-            Trasformo complessi problemi matematici in <span className="text-white font-medium">software elegante e sicuro</span>.
-          </motion.p>
-          
-          <motion.div 
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
-            className="flex flex-wrap justify-center gap-4 pt-4"
-          >
-             <a href="#projects" className="px-8 py-4 bg-white text-black font-bold rounded-full hover:scale-105 transition-transform">
-               Vedi Progetti
-             </a>
-             <a href="#about" className="px-8 py-4 bg-white/5 border border-white/10 text-white rounded-full hover:bg-white/10 transition-colors backdrop-blur-md">
-               About Me
-             </a>
-          </motion.div>
-        </motion.div>
+      <main className="pt-32 px-6 max-w-7xl mx-auto pb-20">
         
-        <motion.div 
-          animate={{ y: [0, 10, 0] }} transition={{ repeat: Infinity, duration: 2 }}
-          className="absolute bottom-10 text-slate-500"
-        >
-          <a href="#stack" className="cursor-pointer hover:text-white transition-colors" aria-label="Scroll to stack">
-            <ChevronDown size={24} />
-          </a>
-        </motion.div>
-      </Section>
-
-      {/* STACK & SKILLS */}
-      <div id="stack" className="w-full bg-[#0a0a1a] border-y border-white/5 py-12 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6">
-          <p className="text-center text-sm text-rose-300/80 font-mono mb-8 uppercase tracking-widest">Tecnologie & Strumenti</p>
-          <div className="flex flex-wrap justify-center gap-4">
-            {skills.map((skill, i) => (
-              <div key={i} className="px-4 py-2 bg-[#1a1a35] border border-red-500/20 rounded-lg text-slate-300 text-sm font-medium hover:border-rose-500/50 hover:text-white hover:shadow-[0_0_15px_rgba(225,29,72,0.3)] transition-all cursor-default">
-                {skill.name}
+        {/* HERO SECTION: SIMULATED TERMINAL */}
+        <section className="min-h-[80vh] flex flex-col justify-center items-center">
+          <TerminalWindow title="sh — 80x24">
+            <div className="space-y-4">
+              <div>
+                <span className="text-green-700">root@massimofedrigo:~$</span> <span className="text-white">./init_portfolio.sh --verbose</span>
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
+              
+              <div className="opacity-70 text-sm space-y-1 pl-4 border-l-2 border-green-900/30">
+                <div>[INFO] Loading kernel modules... <span className="text-white">DONE</span></div>
+                <div>[INFO] Mounting file systems... <span className="text-white">DONE</span></div>
+                <div>[INFO] Initializing user interface... <span className="text-white">DONE</span></div>
+                <div>[INFO] Target identified: <span className="text-green-300 font-bold">Massimo Fedrigo</span></div>
+              </div>
 
-      {/* PROJECTS SECTION */}
-      <Section id="projects">
-        <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
-          <div>
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Progetti <span className="text-rose-500">Rilevanti</span></h2>
-            <p className="text-slate-400 max-w-lg">Una selezione di lavori che spaziano dal web development alla sicurezza informatica e algoritmica.</p>
-          </div>
-          <a href="https://github.com/massimofedrigo" target="_blank" className="flex items-center gap-2 text-rose-400 hover:text-white transition-colors">
-            Vedi tutto su GitHub <ExternalLink size={16} />
-          </a>
-        </div>
+              <div className="py-6">
+                <h1 className="text-4xl md:text-6xl font-bold text-white mb-2 tracking-tighter">
+                  <Typewriter text="MASSIMO FEDRIGO" delay={1.5} />
+                </h1>
+                <p className="text-lg md:text-xl text-green-400">
+                  <span className="text-green-700">{'>'}</span> <Typewriter text="Computer Scientist. Software Engineer. Pentester." delay={2.5} />
+                </p>
+              </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {projects.map((proj, i) => (
-            <GlassCard key={i} className="group flex flex-col h-full">
-              <div className="flex justify-between items-start mb-6">
-                <div className="p-3 bg-white/5 rounded-xl border border-white/10 group-hover:border-rose-500/30 transition-colors">
-                  {proj.icon}
-                </div>
-                <a href={proj.link} target="_blank" className="text-slate-500 hover:text-white transition-colors">
-                  <ExternalLink size={20} />
+              <div className="flex flex-wrap gap-3 pt-4">
+                <a href="#projects" className="px-4 py-2 border border-green-600 hover:bg-green-600 hover:text-black transition-colors text-sm font-bold flex items-center gap-2 group">
+                  <Terminal size={16} /> EXECUTE_PROJECTS
+                </a>
+                <a href={portfolioData.social.github} target="_blank" className="px-4 py-2 border border-green-900 text-green-700 hover:border-green-600 hover:text-green-500 transition-colors text-sm font-bold flex items-center gap-2">
+                  <Github size={16} /> GITHUB_REPO
                 </a>
               </div>
-              
-              <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-rose-300 transition-colors">{proj.title}</h3>
-              <p className="text-slate-400 text-sm leading-relaxed mb-6 flex-grow">{proj.desc}</p>
-              
-              <div className="flex flex-wrap gap-2 pt-4 border-t border-white/5">
-                {proj.tech.map((t, k) => (
-                  <span key={k} className="text-xs font-mono text-rose-200/80 bg-red-950/30 px-2 py-1 rounded">
-                    {t}
-                  </span>
-                ))}
-              </div>
-            </GlassCard>
-          ))}
-        </div>
-      </Section>
+            </div>
+          </TerminalWindow>
+        </section>
 
-      {/* ABOUT SECTION */}
-      <Section id="about">
-        <div className="grid lg:grid-cols-3 gap-12">
-          
-          <div className="lg:col-span-1 space-y-6">
-            <h2 className="text-3xl font-bold text-white">Chi Sono</h2>
-            <div className="w-16 h-1 bg-gradient-to-r from-red-600 to-rose-400 rounded-full"></div>
-            <p className="text-slate-400 leading-relaxed">
-              Sono un <span className="text-white">Computer Scientist</span> con una forte passione per la matematica applicata. 
-            </p>
-            <p className="text-slate-400 leading-relaxed">
-              Mi distinguo per un approccio ibrido: so scrivere codice di produzione pulito (Ingegneria del Software) ma capisco profondamente la teoria sottostante (Computer Science).
-            </p>
-            
-            <GlassCard className="mt-8 !p-6 !bg-gradient-to-br from-red-900/20 to-transparent border-red-500/20">
-              <h4 className="flex items-center gap-2 text-white font-bold mb-2">
-                <Shield size={18} className="text-rose-400" /> Focus Attuale
-              </h4>
-              <p className="text-sm text-slate-400">
-                Sto preparando la certificazione offensiva <strong className="text-white">OSCP</strong> e completando la magistrale in <strong className="text-white">Computational Mathematics</strong>.
-              </p>
-            </GlassCard>
-          </div>
-
-          <div className="lg:col-span-2">
-            <h2 className="text-3xl font-bold text-white mb-8">Percorso</h2>
-            <div className="space-y-6">
-              {experience.map((exp, i) => (
-                <div key={i} className="group relative pl-8 border-l border-white/10 hover:border-rose-500/50 transition-colors pb-2">
-                  <div className="absolute -left-[5px] top-2 w-2.5 h-2.5 rounded-full bg-slate-800 border border-slate-600 group-hover:bg-rose-500 group-hover:border-rose-400 transition-all shadow-[0_0_0_4px_rgba(3,0,20,1)]"></div>
-                  
-                  <span className="text-xs font-mono text-rose-400 mb-1 block">{exp.year}</span>
-                  <h3 className="text-xl font-bold text-white">{exp.role}</h3>
-                  <div className="text-sm text-slate-500 font-medium mb-2">{exp.company}</div>
-                  <p className="text-slate-400 text-sm max-w-xl">{exp.desc}</p>
+        {/* SKILLS SECTION (SYSTEM SPECS) */}
+        <section className="mb-32">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 border-t border-green-900/50 pt-4">
+            <div className="text-green-700 text-xs uppercase tracking-widest">System_Capabilities</div>
+            <div className="md:col-span-3 flex flex-wrap gap-x-8 gap-y-2">
+              {skills.map((skill, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <span className="text-green-700">[+]</span>
+                  <span className="hover:text-white transition-colors cursor-crosshair">{skill}</span>
                 </div>
               ))}
             </div>
           </div>
+        </section>
 
-        </div>
-      </Section>
+        {/* PROJECTS SECTION */}
+        <section id="projects" className="mb-32">
+          <SectionHeader title="Target_List (Projects)" num="1" />
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {projects.map((proj, i) => (
+              <motion.a 
+                href={proj.link}
+                target="_blank"
+                key={i}
+                whileHover={{ scale: 1.02 }}
+                className="block bg-black border border-green-900/60 p-6 hover:border-green-500 hover:shadow-[0_0_15px_rgba(34,197,94,0.2)] transition-all group relative overflow-hidden"
+              >
+                {/* Corner Accents */}
+                <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-green-500 opacity-50 group-hover:opacity-100"></div>
+                <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-green-500 opacity-50 group-hover:opacity-100"></div>
+                <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-green-500 opacity-50 group-hover:opacity-100"></div>
+                <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-green-500 opacity-50 group-hover:opacity-100"></div>
 
-      <footer className="py-8 border-t border-white/5 bg-[#01010a] text-center">
-        <div className="flex justify-center gap-6 mb-6">
-             <a href={portfolioData.social.github} className="text-slate-500 hover:text-white transition-colors"><Github size={20}/></a>
-             <a href={portfolioData.social.linkedin} className="text-slate-500 hover:text-white transition-colors"><Linkedin size={20}/></a>
-             <a href={portfolioData.social.mail} className="text-slate-500 hover:text-white transition-colors"><Mail size={20}/></a>
-        </div>
-        <p className="text-slate-600 text-xs font-mono">
-          © 2025 Massimo Fedrigo. Built with React, Tailwind & Framer Motion.
-        </p>
-      </footer>
+                <div className="flex justify-between items-start mb-4">
+                  <div className="p-2 bg-green-900/20 text-green-400 rounded-sm">
+                    {proj.icon}
+                  </div>
+                  <ExternalLink size={16} className="text-green-800 group-hover:text-green-400" />
+                </div>
+                
+                <div className="text-xs text-green-700 mb-1 font-bold tracking-wider">{proj.type}</div>
+                <h3 className="text-xl font-bold text-white mb-2 group-hover:text-green-400 group-hover:underline decoration-wavy underline-offset-4">{proj.title}</h3>
+                <p className="text-sm text-green-600/80 leading-relaxed">{proj.desc}</p>
+              </motion.a>
+            ))}
+          </div>
+        </section>
 
+        {/* EXPERIENCE / ABOUT */}
+        <section id="about" className="mb-32">
+          <SectionHeader title="Kernel_Log (About)" num="2" />
+          
+          <div className="grid md:grid-cols-2 gap-12">
+            <div className="space-y-6 text-sm leading-relaxed text-green-400/90">
+              <p>
+                <span className="text-white font-bold">{`>>`}</span> Subject: <span className="text-white">Massimo Fedrigo</span>
+              </p>
+              <p>
+                Computer Scientist ibrido con focus su Ingegneria del Software e Sicurezza Offensiva. 
+                Attualmente in fase di upgrade accademico (MSc Computational Mathematics) e certificazione <span className="bg-green-900/30 text-white px-1">OSCP</span>.
+              </p>
+              <p>
+                Approccio analitico alla risoluzione dei problemi: scompongo sistemi complessi in primitive gestibili.
+              </p>
+              
+              <div className="mt-8 p-4 border border-green-900/50 bg-green-900/10 text-xs">
+                <div className="flex items-center gap-2 mb-2 text-green-300 font-bold">
+                  <Shield size={14} /> CURRENT_OBJECTIVE
+                </div>
+                <p className="opacity-70">
+                  Acquisizione certificazione Offensive Security Certified Professional (OSCP). 
+                  Status: In Progress [||||||....]
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-0">
+               <div className="flex items-center gap-2 mb-6 text-green-700 text-xs uppercase tracking-widest">
+                 <Command size={14} /> Execution_History
+               </div>
+               
+               <div className="relative border-l border-green-900/50 pl-8 space-y-8">
+                 <div className="relative">
+                   <div className="absolute -left-[37px] top-1 w-4 h-4 bg-black border border-green-500 rounded-full flex items-center justify-center">
+                     <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                   </div>
+                   <div className="text-xs text-green-700 font-bold">2025 — PRESENT</div>
+                   <div className="text-white font-bold">MSc Computational Mathematics</div>
+                   <div className="text-xs text-green-600">Università di Trieste</div>
+                 </div>
+
+                 <div className="relative">
+                   <div className="absolute -left-[37px] top-1 w-4 h-4 bg-black border border-green-900 rounded-full"></div>
+                   <div className="text-xs text-green-700 font-bold">2023 — PRESENT</div>
+                   <div className="text-white font-bold">Full Stack Engineer (Freelance)</div>
+                   <div className="text-xs text-green-600">Web & Mobile Ecosystems</div>
+                 </div>
+
+                 <div className="relative">
+                   <div className="absolute -left-[37px] top-1 w-4 h-4 bg-black border border-green-900 rounded-full"></div>
+                   <div className="text-xs text-green-700 font-bold">2021 — 2025</div>
+                   <div className="text-white font-bold">BSc Informatica</div>
+                   <div className="text-xs text-green-600">Università di Udine</div>
+                 </div>
+               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* FOOTER / CONTACT */}
+        <section id="contact" className="border-t border-green-900/50 pt-12 text-center">
+          <h3 className="text-xl font-bold text-white mb-8 flex justify-center items-center gap-2">
+            <Hash size={20} className="text-green-600"/> INITIATE_HANDSHAKE
+          </h3>
+          
+          <div className="flex justify-center gap-8 mb-12">
+            <a href={portfolioData.social.mail} className="flex flex-col items-center gap-2 group">
+              <div className="p-4 border border-green-900 rounded-sm group-hover:bg-green-600 group-hover:text-black transition-all">
+                <Mail size={24} />
+              </div>
+              <span className="text-xs text-green-700 group-hover:text-green-500">SEND_MAIL</span>
+            </a>
+            <a href={portfolioData.social.linkedin} className="flex flex-col items-center gap-2 group">
+              <div className="p-4 border border-green-900 rounded-sm group-hover:bg-green-600 group-hover:text-black transition-all">
+                <Linkedin size={24} />
+              </div>
+              <span className="text-xs text-green-700 group-hover:text-green-500">LINKEDIN</span>
+            </a>
+            <a href={portfolioData.social.github} className="flex flex-col items-center gap-2 group">
+              <div className="p-4 border border-green-900 rounded-sm group-hover:bg-green-600 group-hover:text-black transition-all">
+                <Github size={24} />
+              </div>
+              <span className="text-xs text-green-700 group-hover:text-green-500">GITHUB</span>
+            </a>
+          </div>
+          
+          <p className="text-xs text-green-900 font-mono">
+            root@massimofedrigo:~# logout<br/>
+            Connection closed.
+          </p>
+        </section>
+
+      </main>
     </div>
   );
 }
