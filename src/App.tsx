@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { Github, Linkedin, Mail, ExternalLink, Cpu, Shield, Globe, ChevronDown, BookOpen, Network } from 'lucide-react';
+import { Github, Linkedin, Mail, ExternalLink, Cpu, Shield, Globe, ChevronDown, BookOpen, Network, FileText } from 'lucide-react';
 
 // --- DATI PERSONALI ---
 const portfolioData = {
   name: "Massimo Fedrigo",
-  role: "Software Engineer & Computer Scientist",
   location: "Cordenons, PN (Italy)",
-  bio: "Sviluppo architetture software scalabili e studio la matematica dietro gli algoritmi complessi. Attualmente focalizzato su Computational Modelling e Cybersecurity Offensiva.",
   social: {
     github: "https://github.com/massimofedrigo",
     linkedin: "https://www.linkedin.com/in/massimo-fedrigo-33424228a/",
@@ -139,6 +137,54 @@ const SnowOverlay = () => {
   );
 };
 
+// --- COMPONENTE MACCHINA DA SCRIVERE ---
+const TypewriterEffect = ({ words }: { words: string[] }) => {
+  const [index, setIndex] = useState(0);
+  const [subIndex, setSubIndex] = useState(0);
+  const [reverse, setReverse] = useState(false);
+  const [blink, setBlink] = useState(true);
+
+  // Cursore lampeggiante
+  useEffect(() => {
+    const timeout2 = setTimeout(() => {
+      setBlink((prev) => !prev);
+    }, 500);
+    return () => clearTimeout(timeout2);
+  }, [blink]);
+
+  // Logica di scrittura
+  useEffect(() => {
+    if (index >= words.length) {
+        setIndex(0);
+        return;
+    }
+
+    if (subIndex === words[index].length + 1 && !reverse) {
+      setTimeout(() => setReverse(true), 1500); // Attesa fine parola
+      return;
+    }
+
+    if (subIndex === 0 && reverse) {
+      setReverse(false);
+      setIndex((prev) => (prev + 1) % words.length);
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      setSubIndex((prev) => prev + (reverse ? -1 : 1));
+    }, reverse ? 50 : 100);
+
+    return () => clearTimeout(timeout);
+  }, [subIndex, index, reverse, words]);
+
+  return (
+    <span className="text-slate-200">
+      {words[index].substring(0, subIndex)}
+      <span className={`${blink ? "opacity-100" : "opacity-0"} text-rose-500 font-bold ml-1`}>|</span>
+    </span>
+  );
+};
+
 export default function Portfolio() {
   const { scrollYProgress } = useScroll();
   const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
@@ -184,7 +230,6 @@ export default function Portfolio() {
         <motion.div style={{ opacity, scale }} className="space-y-8 max-w-3xl relative z-10 flex flex-col items-center">
           
           {/* BADGE DI STATO */}
-          {/* Posizionato come blocco flessibile centrato, indipendente dal titolo */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-950/80 border border-amber-500/50 text-red-100 text-sm font-bold tracking-wider uppercase mb-2 shadow-[0_0_15px_rgba(245,158,11,0.2)] backdrop-blur-md"
@@ -193,14 +238,13 @@ export default function Portfolio() {
             Merry Coding 🎄
           </motion.div>
 
-          {/* CONTENITORE NOME + CAPPELLO */}
           <div className="relative inline-block mt-4">
-            {/* Cappello di Babbo Natale */}
+            {/* EMOJI BABBO NATALE (Ritornata!) */}
             <motion.span 
               initial={{ opacity: 0, y: -20, rotate: -20 }}
               animate={{ opacity: 1, y: 0, rotate: -12 }}
               transition={{ delay: 0.5, type: "spring" }}
-              className="absolute -top-7 -left-4 md:-top-10 md:-left-6 text-5xl md:text-7xl z-20 filter drop-shadow-lg pointer-events-none"
+              className="absolute -top-7 -left-4 md:-top-10 md:-left-6 text-5xl md:text-7xl z-20 filter drop-shadow-lg cursor-default"
               style={{ filter: "drop-shadow(0 0 10px rgba(255,0,0,0.5))" }}
             >
               🎅
@@ -215,23 +259,32 @@ export default function Portfolio() {
             </motion.h1>
           </div>
 
-          <motion.p 
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed"
-          >
-            Computer Scientist & Software Engineer. <br className="hidden md:block"/>
-            Trasformo complessi problemi matematici in <span className="text-white font-medium">software elegante e sicuro</span>.
-          </motion.p>
+          {/* Typewriter Effect */}
+          <div className="text-lg md:text-2xl text-slate-400 h-8">
+            <TypewriterEffect words={[
+              "Computer Scientist", 
+              "Software Engineer", 
+              "Cybersecurity Enthusiast", 
+              "Math Geek"
+            ]} />
+          </div>
           
           <motion.div 
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
-            className="flex flex-wrap justify-center gap-4 pt-4"
+            className="flex flex-wrap justify-center gap-4 pt-8"
           >
              <a href="#projects" className="px-8 py-4 bg-white text-black font-bold rounded-full hover:scale-105 transition-transform">
                Vedi Progetti
              </a>
-             <a href="#about" className="px-8 py-4 bg-white/5 border border-white/10 text-white rounded-full hover:bg-white/10 transition-colors backdrop-blur-md">
-               About Me
+             
+             {/* Bottone Download CV */}
+             <a 
+               href="/cv.pdf" 
+               download 
+               className="px-8 py-4 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-full hover:scale-105 transition-transform flex items-center gap-2 shadow-lg shadow-rose-900/20"
+             >
+               <FileText size={20} />
+               Scarica CV
              </a>
           </motion.div>
         </motion.div>
