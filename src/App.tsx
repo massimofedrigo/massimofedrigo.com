@@ -1,262 +1,315 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Github, Linkedin, Mail, ExternalLink, Terminal, Database, Shield, Code, ChevronRight, Download } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { Github, Linkedin, Mail, ExternalLink, Terminal, Cpu, Shield, Globe, ChevronDown, Code2, BookOpen, Network } from 'lucide-react';
 
-// --- DATI ESTRATTI DAL TUO CV ---
+// --- DATI PERSONALI (I tuoi dati) ---
+const portfolioData = {
+  name: "Massimo Fedrigo",
+  role: "Software Engineer & Computer Scientist",
+  location: "Cordenons, PN (Italy)",
+  bio: "Sviluppo architetture software scalabili e studio la matematica dietro gli algoritmi complessi. Attualmente focalizzato su Computational Modelling e Cybersecurity Offensiva.",
+  social: {
+    github: "https://github.com/massimofedrigo",
+    linkedin: "https://www.linkedin.com/in/massimo-fedrigo-33424228a/",
+    mail: "mailto:massimofedrigo.dev@gmail.com"
+  }
+};
 
 const skills = [
-  "Python", "Java", "C++", "JavaScript/TypeScript", "React & Vue.js", 
-  "Flutter", "Node.js", "Symfony", "PostgreSQL", "Docker", "Machine Learning", "Cybersecurity"
+  { name: "Python", level: 95 }, { name: "Java", level: 90 }, 
+  { name: "React / Vue", level: 85 }, { name: "Flutter", level: 85 },
+  { name: "Node.js", level: 80 }, { name: "Symfony", level: 80 },
+  { name: "C / C++", level: 75 }, { name: "Cybersecurity (OSCP)", level: 70 }
 ];
 
 const projects = [
   {
+    title: "Overdiet",
+    desc: "Piattaforma Web & Mobile multiutente per la gestione di piani alimentari automatizzati.",
+    tech: ["PHP", "Symfony", "Javascript", "Node.js", "VUE.js", "Dart", "Flutter"],
+    link: "https://overdiet.com",
+    icon: <Cpu className="text-pink-400" />
+  },
+  {
+    title: "Stradella Fitness",
+    desc: "Piattaforma Web & Mobile monoutente per la gestione di piani alimentari automatizzati.",
+    tech: ["PHP", "Symfony", "Javascript", "Node.js", "VUE.js", "Dart", "Flutter"],
+    link: "https://stradellafitness.com",
+    icon: <Cpu className="text-pink-400" />
+  },
+  {
     title: "Synthetic Pages",
-    desc: "Generatore di siti statici basato su LLM e Google Trends. Pipeline completamente automatizzata.",
-    tags: ["Python", "Jinja2", "LLM API"],
-    link: "https://github.com/massimofedrigo/synthetic-pages", // Inserisci link reale
-    type: "AI & Automation"
+    desc: "Generatore automatizzato di siti statici basato su LLM e trend di ricerca Google.",
+    tech: ["Python", "Jinja2", "OpenAI API"],
+    link: "https://github.com/massimofedrigo/synthetic-pages",
+    icon: <Globe className="text-violet-400" />
   },
   {
     title: "Cyphermesh",
-    desc: "Rete P2P decentralizzata per la condivisione di Threat Intelligence con sistema di reputazione.",
-    tags: ["Python", "Flask", "C", "P2P"],
+    desc: "Rete P2P decentralizzata per la condivisione di Threat Intelligence con trust system.",
+    tech: ["Python", "Flask", "C", "P2P"],
     link: "https://github.com/massimofedrigo/cyphermesh",
-    type: "Security"
+    icon: <Network className="text-blue-400" />
   },
   {
     title: "Algowiki.dev",
-    desc: "Enciclopedia di algoritmi con analisi di complessità e dimostrazioni matematiche.",
-    tags: ["Markdown", "Mkdocs", "CS Theory"],
+    desc: "Enciclopedia didattica di algoritmi con analisi di complessità e dimostrazioni.",
+    tech: ["Markdown", "Mkdocs", "MathJax"],
     link: "https://algowiki.dev",
-    external: true,
-    type: "Education"
-  },
-  {
-    title: "RS Coaching Platform",
-    desc: "Ecosistema Web & Mobile per dietisti. App Flutter cross-platform e dashboard Vue.js.",
-    tags: ["Flutter", "Node.js", "Symfony", "MySQL"],
-    link: "https://rscoaching.it", 
-    external: true,
-    type: "Full Stack"
+    icon: <BookOpen className="text-emerald-400" />
   }
 ];
 
 const experience = [
   {
-    role: "Full Stack Developer",
-    company: "Freelance",
-    period: "2023 - Presente",
-    details: "Sviluppo ecosistemi Web/Mobile complessi (es. Overdiet, Stradellafitness). Migrazione legacy code e design API REST."
+    year: "2023 - Presente",
+    role: "Full Stack Developer Freelance",
+    company: "Progetti Vari",
+    desc: "Sviluppo di piattaforme complesse come Overdiet e Stradella Fitness. Migrazione legacy code, API Design e Mobile App development."
   },
   {
+    year: "2025 - Presente",
     role: "MSc Computational Mathematics",
     company: "Università di Trieste",
-    period: "2025 - Presente",
-    details: "Focus su algoritmi avanzati, ottimizzazione e modelli di Machine Learning."
+    desc: "Specializzazione in ottimizzazione numerica, machine learning e modellazione stocastica."
   },
   {
+    year: "2021 - 2025",
     role: "BSc Informatica",
     company: "Università di Udine",
-    period: "2021 - 2025",
-    details: "Tesi su SVD randomizzato. Laurea con focus su ingegneria del software."
+    desc: "Laurea triennale. Tesi: 'Algoritmo per il calcolo randomizzato della Singular Value Decomposition (SVD)'."
   }
 ];
 
 // --- COMPONENTI UI ---
 
-const Section = ({ children, id, className = "" }) => (
-  <section id={id} className={`py-20 px-6 md:px-20 max-w-7xl mx-auto ${className}`}>
+const Section = ({ children, className = "", id = "" }) => (
+  <section id={id} className={`py-24 px-6 md:px-12 max-w-7xl mx-auto relative z-10 ${className}`}>
     {children}
   </section>
 );
 
-const Card = ({ children, delay = 0 }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true }}
-    transition={{ duration: 0.5, delay }}
-    className="bg-slate-900/50 backdrop-blur-md border border-slate-800 p-6 rounded-2xl hover:border-teal-500/50 transition-colors group"
+const GlassCard = ({ children, className = "", hoverEffect = true }) => (
+  <motion.div 
+    whileHover={hoverEffect ? { y: -5, boxShadow: "0 20px 40px -10px rgba(124, 58, 237, 0.15)" } : {}}
+    className={`bg-[#11112b]/60 backdrop-blur-xl border border-white/5 p-8 rounded-3xl overflow-hidden relative ${className}`}
   >
+    {/* Subtle gradient overlay */}
+    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
     {children}
   </motion.div>
 );
 
+const GradientText = ({ children, className = "" }) => (
+  <span className={`bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-400 ${className}`}>
+    {children}
+  </span>
+);
+
 export default function Portfolio() {
+  const { scrollYProgress } = useScroll();
+  const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
+  const scale = useTransform(scrollYProgress, [0, 0.2], [1, 0.95]);
+
+  // Background blobs animation
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  useEffect(() => {
+    const handleMouseMove = (e) => setMousePosition({ x: e.clientX, y: e.clientY });
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
+
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-slate-300 font-sans selection:bg-teal-500/30 selection:text-teal-200">
+    <div className="min-h-screen bg-[#030014] text-slate-300 font-sans overflow-x-hidden selection:bg-violet-500/30 selection:text-white">
       
-      {/* BACKGROUND ELEMENTS */}
+      {/* DYNAMIC BACKGROUND */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-teal-600/10 rounded-full blur-[120px]" />
-        <div className="absolute bottom-[10%] right-[-5%] w-[400px] h-[400px] bg-blue-600/10 rounded-full blur-[120px]" />
+        {/* Deep stars/noise texture could go here */}
+        <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-violet-900/20 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-cyan-900/10 rounded-full blur-[100px]" />
+        
+        {/* Mouse follower blob */}
+        <motion.div 
+          className="absolute w-[400px] h-[400px] bg-indigo-600/10 rounded-full blur-[100px]"
+          animate={{ x: mousePosition.x - 200, y: mousePosition.y - 200 }}
+          transition={{ type: "spring", damping: 30, stiffness: 50 }}
+        />
       </div>
 
       {/* NAVBAR */}
-      <nav className="fixed top-0 w-full z-50 bg-[#0a0a0a]/80 backdrop-blur-lg border-b border-white/5">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <span className="font-bold text-xl text-white tracking-tighter">MF<span className="text-teal-500">.</span></span>
-          <div className="flex gap-6 text-sm font-medium">
-            <a href="#projects" className="hover:text-teal-400 transition-colors">Progetti</a>
-            <a href="#about" className="hover:text-teal-400 transition-colors">About</a>
-            <a href="#contact" className="hover:text-teal-400 transition-colors">Contatti</a>
-          </div>
+      <nav className="fixed top-0 w-full z-50 px-6 py-6 flex justify-between items-center max-w-7xl mx-auto left-0 right-0">
+        <a href="#" className="bg-white/5 p-2 rounded-full border border-white/5 backdrop-blur-md hover:bg-white/10 transition-colors shadow-lg shadow-violet-500/10">
+          <img src="/favicon.svg" alt="MF Logo" className="w-8 h-8" />
+        </a>
+
+        <div className="flex gap-4">
+          <a href={portfolioData.social.github} target="_blank" className="p-2 bg-white/5 rounded-full hover:bg-white/10 hover:text-white transition-colors border border-white/5"><Github size={20}/></a>
+          <a href={portfolioData.social.linkedin} target="_blank" className="p-2 bg-white/5 rounded-full hover:bg-white/10 hover:text-white transition-colors border border-white/5"><Linkedin size={20}/></a>
+          <a href={portfolioData.social.mail} className="p-2 bg-violet-600/80 text-white rounded-full hover:bg-violet-500 transition-colors shadow-lg shadow-violet-500/20"><Mail size={20}/></a>
         </div>
       </nav>
 
       {/* HERO SECTION */}
-      <Section className="pt-40 md:pt-60 min-h-[90vh] flex flex-col justify-center relative z-10">
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8 }}
-        >
-          <div className="flex items-center gap-2 text-teal-500 font-mono mb-4 text-sm tracking-wide">
-            <Terminal size={16} />
-            <span>SOFTWARE ENGINEER & COMPUTER SCIENTIST</span>
-          </div>
-          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 tracking-tight leading-tight">
-            Massimo <br className="md:hidden"/>Fedrigo
-          </h1>
-          <p className="max-w-xl text-lg text-slate-400 leading-relaxed mb-8">
-            Costruisco architetture backend scalabili, interfacce moderne e studio la matematica degli algoritmi. 
-            Attualmente focalizzato su <span className="text-white font-medium">Computational Modelling</span> e <span className="text-white font-medium">Cybersecurity</span>.
-          </p>
+      <Section className="min-h-screen flex flex-col justify-center items-center text-center pt-20">
+        <motion.div style={{ opacity, scale }} className="space-y-8 max-w-3xl">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-950/30 border border-violet-500/30 text-violet-300 text-xs font-medium tracking-wider uppercase mb-4"
+          >
+            <span className="w-2 h-2 rounded-full bg-violet-400 animate-pulse"></span>
+            Disponibile
+          </motion.div>
+
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.1 }}
+            className="text-6xl md:text-8xl font-bold text-white tracking-tight leading-none"
+          >
+            Massimo <br />
+            <GradientText>Fedrigo</GradientText>
+          </motion.h1>
+
+          <motion.p 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed"
+          >
+            Computer Scientist & Software Engineer. <br className="hidden md:block"/>
+            Trasformo complessi problemi matematici in <span className="text-white font-medium">software elegante e sicuro</span>.
+          </motion.p>
           
-          <div className="flex flex-wrap gap-4">
-            <a href="#projects" className="px-6 py-3 bg-teal-600 hover:bg-teal-500 text-white font-medium rounded-lg transition-all flex items-center gap-2">
-              Vedi Lavori <ChevronRight size={18} />
-            </a>
-            <a href="https://github.com/massimofedrigo" target="_blank" rel="noreferrer" className="px-6 py-3 border border-slate-700 hover:border-slate-500 text-white font-medium rounded-lg transition-all flex items-center gap-2">
-              <Github size={18} /> GitHub
-            </a>
-          </div>
+          <motion.div 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
+            className="flex flex-wrap justify-center gap-4 pt-4"
+          >
+             <a href="#projects" className="px-8 py-4 bg-white text-black font-bold rounded-full hover:scale-105 transition-transform">
+               Vedi Progetti
+             </a>
+             <a href="#about" className="px-8 py-4 bg-white/5 border border-white/10 text-white rounded-full hover:bg-white/10 transition-colors backdrop-blur-md">
+               About Me
+             </a>
+          </motion.div>
+        </motion.div>
+        
+        {/* MODIFICA QUI: Aggiunto tag <a> attorno all'icona */}
+        <motion.div 
+          animate={{ y: [0, 10, 0] }} transition={{ repeat: Infinity, duration: 2 }}
+          className="absolute bottom-10 text-slate-500"
+        >
+          <a href="#stack" className="cursor-pointer hover:text-white transition-colors" aria-label="Scroll to stack">
+            <ChevronDown size={24} />
+          </a>
         </motion.div>
       </Section>
 
-      {/* TECH STACK (Marquee style or Grid) */}
-      <div className="border-y border-white/5 bg-white/5 backdrop-blur-sm z-10 relative">
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <p className="text-center text-xs font-mono text-slate-500 mb-6 uppercase tracking-widest">Stack Tecnologico</p>
-          <div className="flex flex-wrap justify-center gap-3 md:gap-6">
+      {/* STACK & SKILLS MARQUEE-LIKE GRID */}
+      <div id="stack" className="w-full bg-[#0a0a1a] border-y border-white/5 py-12 relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6">
+          <p className="text-center text-sm text-violet-400 font-mono mb-8 uppercase tracking-widest">Tecnologie & Strumenti</p>
+          <div className="flex flex-wrap justify-center gap-4">
             {skills.map((skill, i) => (
-              <span key={i} className="px-3 py-1 text-sm md:text-base text-slate-300 bg-slate-800/50 rounded-md border border-slate-700/50 hover:border-teal-500/30 hover:text-teal-400 transition-colors cursor-default">
-                {skill}
-              </span>
+              <div key={i} className="px-4 py-2 bg-[#1a1a35] border border-violet-500/20 rounded-lg text-slate-300 text-sm font-medium hover:border-violet-500/50 hover:text-white hover:shadow-[0_0_15px_rgba(139,92,246,0.3)] transition-all cursor-default">
+                {skill.name}
+              </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* PROJECTS SECTION */}
+      {/* PROJECTS SECTION (BENTO GRID STYLE) */}
       <Section id="projects">
-        <div className="flex items-center justify-between mb-12">
-          <h2 className="text-3xl font-bold text-white">Progetti Selezionati</h2>
-          <Code className="text-teal-600 opacity-50" />
+        <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
+          <div>
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Progetti <span className="text-violet-500">Rilevanti</span></h2>
+            <p className="text-slate-400 max-w-lg">Una selezione di lavori che spaziano dal web development alla sicurezza informatica e algoritmica.</p>
+          </div>
+          <a href="https://github.com/massimofedrigo" target="_blank" className="flex items-center gap-2 text-violet-400 hover:text-white transition-colors">
+            Vedi tutto su GitHub <ExternalLink size={16} />
+          </a>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {projects.map((project, i) => (
-            <Card key={i} delay={i * 0.1}>
-              <div className="flex justify-between items-start mb-4">
-                <div className="text-xs font-mono text-teal-500 mb-2">{project.type}</div>
-                <div className="flex gap-3">
-                  {project.link && (
-                    <a href={project.link} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-white transition-colors">
-                      {project.external ? <ExternalLink size={20} /> : <Github size={20} />}
-                    </a>
-                  )}
+          {projects.map((proj, i) => (
+            <GlassCard key={i} className="group flex flex-col h-full">
+              <div className="flex justify-between items-start mb-6">
+                <div className="p-3 bg-white/5 rounded-xl border border-white/10 group-hover:border-violet-500/30 transition-colors">
+                  {proj.icon}
                 </div>
+                <a href={proj.link} target="_blank" className="text-slate-500 hover:text-white transition-colors">
+                  <ExternalLink size={20} />
+                </a>
               </div>
-              <h3 className="text-xl font-bold text-white mb-2 group-hover:text-teal-400 transition-colors">
-                {project.title}
-              </h3>
-              <p className="text-slate-400 text-sm mb-6 leading-relaxed">
-                {project.desc}
-              </p>
-              <div className="flex flex-wrap gap-2 mt-auto">
-                {project.tags.map((tag, t) => (
-                  <span key={t} className="text-xs px-2 py-1 rounded bg-slate-800 text-slate-300 font-mono">
-                    {tag}
+              
+              <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-violet-300 transition-colors">{proj.title}</h3>
+              <p className="text-slate-400 text-sm leading-relaxed mb-6 flex-grow">{proj.desc}</p>
+              
+              <div className="flex flex-wrap gap-2 pt-4 border-t border-white/5">
+                {proj.tech.map((t, k) => (
+                  <span key={k} className="text-xs font-mono text-violet-300/80 bg-violet-900/20 px-2 py-1 rounded">
+                    {t}
                   </span>
                 ))}
               </div>
-            </Card>
+            </GlassCard>
           ))}
         </div>
       </Section>
 
-      {/* EXPERIENCE & EDUCATION SECTION */}
-      <Section id="about" className="bg-[#0f0f0f]/50">
-        <div className="grid md:grid-cols-2 gap-12">
-          <div>
-            <h2 className="text-3xl font-bold text-white mb-8 flex items-center gap-3">
-              <Database size={24} className="text-teal-500" /> Percorso
-            </h2>
-            <div className="space-y-8 border-l border-slate-800 pl-8 relative">
+      {/* ABOUT & TIMELINE SECTION */}
+      <Section id="about">
+        <div className="grid lg:grid-cols-3 gap-12">
+          
+          {/* Left Column: Bio */}
+          <div className="lg:col-span-1 space-y-6">
+            <h2 className="text-3xl font-bold text-white">Chi Sono</h2>
+            <div className="w-16 h-1 bg-gradient-to-r from-violet-500 to-cyan-500 rounded-full"></div>
+            <p className="text-slate-400 leading-relaxed">
+              Sono un <span className="text-white">Computer Scientist</span> con una forte passione per la matematica applicata. 
+            </p>
+            <p className="text-slate-400 leading-relaxed">
+              Mi distinguo per un approccio ibrido: so scrivere codice di produzione pulito (Ingegneria del Software) ma capisco profondamente la teoria sottostante (Computer Science).
+            </p>
+            
+            <GlassCard className="mt-8 !p-6 !bg-gradient-to-br from-violet-900/20 to-transparent border-violet-500/20">
+              <h4 className="flex items-center gap-2 text-white font-bold mb-2">
+                <Shield size={18} className="text-emerald-400" /> Focus Attuale
+              </h4>
+              <p className="text-sm text-slate-400">
+                Sto preparando la certificazione offensiva <strong className="text-white">OSCP</strong> e completando la magistrale in <strong className="text-white">Computational Mathematics</strong>.
+              </p>
+            </GlassCard>
+          </div>
+
+          {/* Right Column: Timeline */}
+          <div className="lg:col-span-2">
+            <h2 className="text-3xl font-bold text-white mb-8">Percorso</h2>
+            <div className="space-y-6">
               {experience.map((exp, i) => (
-                <div key={i} className="relative">
-                  <span className="absolute -left-[37px] top-1 h-4 w-4 rounded-full bg-slate-900 border-2 border-teal-600"></span>
-                  <span className="text-xs font-mono text-teal-500 block mb-1">{exp.period}</span>
-                  <h4 className="text-lg font-bold text-white">{exp.role}</h4>
-                  <p className="text-slate-400 text-sm mb-2">{exp.company}</p>
-                  <p className="text-slate-500 text-sm">{exp.details}</p>
+                <div key={i} className="group relative pl-8 border-l border-white/10 hover:border-violet-500/50 transition-colors pb-2">
+                  <div className="absolute -left-[5px] top-2 w-2.5 h-2.5 rounded-full bg-slate-800 border border-slate-600 group-hover:bg-violet-500 group-hover:border-violet-400 transition-all shadow-[0_0_0_4px_rgba(3,0,20,1)]"></div>
+                  
+                  <span className="text-xs font-mono text-violet-400 mb-1 block">{exp.year}</span>
+                  <h3 className="text-xl font-bold text-white">{exp.role}</h3>
+                  <div className="text-sm text-slate-500 font-medium mb-2">{exp.company}</div>
+                  <p className="text-slate-400 text-sm max-w-xl">{exp.desc}</p>
                 </div>
               ))}
             </div>
           </div>
 
-          <div>
-            <h2 className="text-3xl font-bold text-white mb-8 flex items-center gap-3">
-              <Shield size={24} className="text-teal-500" /> Focus Attuale
-            </h2>
-            <Card>
-              <p className="text-slate-300 leading-relaxed mb-6">
-                Oltre allo sviluppo software, sto approfondendo la <strong>Cybersecurity Offensiva</strong> (preparazione OSCP) e i modelli matematici computazionali.
-              </p>
-              <p className="text-slate-300 leading-relaxed">
-                Partecipo a sfide CTF su <strong>HackTheBox</strong> e competitive programming su <strong>Codeforces</strong>. 
-                Credo fermamente che un buon ingegnere debba padroneggiare sia l'astrazione matematica che l'implementazione pratica.
-              </p>
-              
-              <div className="mt-8 pt-8 border-t border-slate-800">
-                 <h4 className="text-white font-bold mb-4">Interessi Personali</h4>
-                 <div className="flex gap-4 text-slate-400 text-sm">
-                    <span>📚 Lettura</span>
-                    <span>🏋️ Calisthenics</span>
-                    <span>🎨 Disegno</span>
-                 </div>
-              </div>
-            </Card>
-          </div>
         </div>
       </Section>
 
       {/* FOOTER */}
-      <footer id="contact" className="py-12 border-t border-slate-800 bg-[#050505]">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="text-center md:text-left">
-            <h3 className="text-white font-bold text-lg">Massimo Fedrigo</h3>
-            <p className="text-slate-500 text-sm">Software Engineer & Computer Scientist</p>
-          </div>
-          
-          <div className="flex gap-6">
-             <a href="mailto:massimofedrigo.dev@gmail.com" className="text-slate-400 hover:text-teal-400 transition-transform hover:-translate-y-1">
-               <Mail size={24} />
-             </a>
-             <a href="https://linkedin.com/in/massimo-fedrigo-33424228a/" target="_blank" rel="noreferrer" className="text-slate-400 hover:text-teal-400 transition-transform hover:-translate-y-1">
-               <Linkedin size={24} />
-             </a>
-             <a href="https://github.com/massimofedrigo" target="_blank" rel="noreferrer" className="text-slate-400 hover:text-teal-400 transition-transform hover:-translate-y-1">
-               <Github size={24} />
-             </a>
-          </div>
+      <footer className="py-8 border-t border-white/5 bg-[#01010a] text-center">
+        <div className="flex justify-center gap-6 mb-6">
+             <a href={portfolioData.social.github} className="text-slate-500 hover:text-white transition-colors"><Github size={20}/></a>
+             <a href={portfolioData.social.linkedin} className="text-slate-500 hover:text-white transition-colors"><Linkedin size={20}/></a>
+             <a href={portfolioData.social.mail} className="text-slate-500 hover:text-white transition-colors"><Mail size={20}/></a>
         </div>
-        <div className="text-center text-slate-700 text-xs mt-8 font-mono">
-          &copy; 2025 Massimo Fedrigo. Built with React & Tailwind.
-        </div>
+        <p className="text-slate-600 text-xs font-mono">
+          © 2025 Massimo Fedrigo. Built with React, Tailwind & Framer Motion.
+        </p>
       </footer>
+
     </div>
   );
 }
