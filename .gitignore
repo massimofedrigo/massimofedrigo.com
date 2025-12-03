@@ -1,0 +1,44 @@
+# Dipendenze Node.js
+/node_modules
+/dist
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Configurazioni locali/credenziali
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Vite
+.vite
+/coverage
+
+# File di build statici e cache
+# Vengono generati dal comando 'npm run build'
+/build
+/out
+/public/build
+/temp
+
+# Sistema Operativo (Mac/Windows)
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.iml
+
+# File generati da npm (se usi npm v7+)
+package-lock.json
+
+# Vite JS per la cache
+/node_modules/.vite
