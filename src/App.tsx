@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
+// FIX: Aggiunti ExternalLink, Shield e FileText che mancavano nell'import
 import { Github, Linkedin, Mail, ExternalLink, Cpu, Shield, Globe, ChevronDown, BookOpen, Network, FileText } from 'lucide-react';
 
 // --- DATI PERSONALI ---
 const portfolioData = {
   name: "Massimo Fedrigo",
+  role: "Software Engineer & Computer Scientist",
   location: "Cordenons, PN (Italy)",
+  bio: "Sviluppo architetture software scalabili e studio la matematica dietro gli algoritmi complessi. Attualmente focalizzato su Computational Modelling e Cybersecurity Offensiva.",
   social: {
     github: "https://github.com/massimofedrigo",
     linkedin: "https://www.linkedin.com/in/massimo-fedrigo-33424228a/",
@@ -144,7 +147,6 @@ const TypewriterEffect = ({ words }: { words: string[] }) => {
   const [reverse, setReverse] = useState(false);
   const [blink, setBlink] = useState(true);
 
-  // Cursore lampeggiante
   useEffect(() => {
     const timeout2 = setTimeout(() => {
       setBlink((prev) => !prev);
@@ -152,7 +154,6 @@ const TypewriterEffect = ({ words }: { words: string[] }) => {
     return () => clearTimeout(timeout2);
   }, [blink]);
 
-  // Logica di scrittura
   useEffect(() => {
     if (index >= words.length) {
         setIndex(0);
@@ -160,7 +161,7 @@ const TypewriterEffect = ({ words }: { words: string[] }) => {
     }
 
     if (subIndex === words[index].length + 1 && !reverse) {
-      setTimeout(() => setReverse(true), 1500); // Attesa fine parola
+      setTimeout(() => setReverse(true), 1500);
       return;
     }
 
@@ -238,8 +239,10 @@ export default function Portfolio() {
             Merry Coding 🎄
           </motion.div>
 
+          {/* CONTENITORE NOME + CAPPELLO */}
           <div className="relative inline-block mt-4">
-            {/* EMOJI BABBO NATALE (Ritornata!) */}
+            
+            {/* EMOJI CAPPELLO BABBO NATALE */}
             <motion.span 
               initial={{ opacity: 0, y: -20, rotate: -20 }}
               animate={{ opacity: 1, y: 0, rotate: -12 }}
@@ -259,7 +262,6 @@ export default function Portfolio() {
             </motion.h1>
           </div>
 
-          {/* Typewriter Effect */}
           <div className="text-lg md:text-2xl text-slate-400 h-8">
             <TypewriterEffect words={[
               "Computer Scientist", 
@@ -278,17 +280,20 @@ export default function Portfolio() {
           
           <motion.div 
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
-            className="flex flex-wrap justify-center gap-4 pt-8"
+            className="flex flex-wrap justify-center gap-4 pt-8 w-full px-4"
           >
-             <a href="#projects" className="px-8 py-4 bg-white text-black font-bold rounded-full hover:scale-105 transition-transform">
+             {/* MODIFICA: Bottoni ottimizzati w-44 / w-full */}
+             <a 
+               href="#projects" 
+               className="w-full sm:w-44 px-6 py-3 bg-white text-black font-bold rounded-full hover:scale-105 transition-transform flex justify-center items-center"
+             >
                Vedi Progetti
              </a>
              
-             {/* Bottone Download CV */}
              <a 
                href="/cv.pdf" 
-               download 
-               className="px-8 py-4 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-full hover:scale-105 transition-transform flex items-center gap-2 shadow-lg shadow-rose-900/20"
+               download
+               className="w-full sm:w-44 px-6 py-3 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-full hover:scale-105 transition-transform flex justify-center items-center gap-2 shadow-lg shadow-rose-900/20"
              >
                <FileText size={20} />
                Scarica CV
