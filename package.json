@@ -1,6 +1,6 @@
 {
-  "name": "portfolio",
-  "homepage": "https://massimofedrigo.github.io/massimofedrigo.com",
+  "name": "massimofedrigo.com",
+  "homepage": "https://massimofedrigo.com",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -27,6 +27,7 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "framer-motion": "^12.23.25",
+    "gh-pages": "^6.3.0",
     "globals": "^16.5.0",
     "lucide-react": "^0.555.0",
     "postcss": "^8.5.6",
