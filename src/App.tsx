@@ -1,7 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-// FIX: Aggiunti ExternalLink, Shield e FileText che mancavano nell'import
-import { Github, Linkedin, Mail, ExternalLink, Cpu, Shield, Globe, ChevronDown, BookOpen, Network, FileText } from 'lucide-react';
+
+// --- ICONE ---
+import { 
+  Github, Linkedin, Mail, ExternalLink, 
+  Terminal, Cpu, Shield, ChevronDown, 
+  Code2, BookOpen, Network, FileText, 
+  Database, Layers, Globe 
+} from 'lucide-react';
+
+import { 
+  // Linguaggi & Core
+  SiPython, SiCplusplus, SiTypescript, SiPhp, SiGnubash, SiDart,
+  // Frontend & Mobile
+  SiFlutter, SiVuedotjs, SiReact, SiTailwindcss, SiBootstrap, 
+  // Backend & DB
+  SiNodedotjs, SiSymfony, SiFlask, SiDjango, SiPostgresql, SiMysql, 
+  // Tools, Security & Data
+  SiDocker, SiGit, SiLinux, SiKalilinux, SiNumpy, SiPandas, 
+  SiBurpsuite, SiWireshark 
+} from "react-icons/si";
+
+import { FaJava } from "react-icons/fa";
 
 // --- DATI PERSONALI ---
 const portfolioData = {
@@ -16,11 +36,57 @@ const portfolioData = {
   }
 };
 
-const skills = [
-  { name: "Python", level: 95 }, { name: "Java", level: 90 }, 
-  { name: "React / Vue", level: 85 }, { name: "Flutter", level: 85 },
-  { name: "Node.js", level: 80 }, { name: "Symfony", level: 80 },
-  { name: "C / C++", level: 75 }, { name: "Cybersecurity (OSCP)", level: 70 }
+// --- DATA: SKILLS (Horizontal Tracks) ---
+const skillTracks = [
+  {
+    title: "Software Engineering & Product",
+    subtitle: "Sviluppo Full Stack Web & Mobile",
+    icon: <Layers className="text-amber-400" />, // Changed to Amber (Gold/Star color)
+    description: "Lo stack produttivo che utilizzo per costruire piattaforme scalabili, da app mobile cross-platform a backend complessi.",
+    skills: [
+      { name: "Dart", icon: <SiDart />, color: "text-blue-400" },
+      { name: "Flutter", icon: <SiFlutter />, color: "text-cyan-400" },
+      { name: "TypeScript", icon: <SiTypescript />, color: "text-blue-500" },
+      { name: "Node.js", icon: <SiNodedotjs />, color: "text-green-500" },
+      { name: "Vue.js", icon: <SiVuedotjs />, color: "text-emerald-400" },
+      { name: "React", icon: <SiReact />, color: "text-cyan-300" },
+      { name: "PHP", icon: <SiPhp />, color: "text-indigo-400" },
+      { name: "Symfony", icon: <SiSymfony />, color: "text-white" },
+      { name: "Django", icon: <SiDjango />, color: "text-emerald-700" },
+      { name: "Flask", icon: <SiFlask />, color: "text-slate-300" }
+    ]
+  },
+  {
+    title: "Computer Science & Offensive Security",
+    subtitle: "Basso livello, Algoritmi e Pentesting",
+    icon: <Terminal className="text-red-500" />, // Changed to Red (Santa color)
+    description: "Il lato accademico e offensivo. Dal calcolo numerico ad alte prestazioni all'analisi delle vulnerabilità.",
+    skills: [
+      { name: "Python", icon: <SiPython />, color: "text-yellow-400" },
+      { name: "C / C++", icon: <SiCplusplus />, color: "text-blue-600" },
+      { name: "Java", icon: <FaJava />, color: "text-red-500" },
+      { name: "Assembly", icon: <Cpu />, color: "text-slate-400" },
+      { name: "Kali Linux", icon: <SiKalilinux />, color: "text-blue-400" },
+      { name: "Burp Suite", icon: <SiBurpsuite />, color: "text-orange-400" },
+      { name: "Wireshark", icon: <SiWireshark />, color: "text-blue-300" },
+      { name: "NumPy", icon: <SiNumpy />, color: "text-cyan-600" },
+      { name: "Pandas", icon: <SiPandas />, color: "text-purple-300" }
+    ]
+  },
+  {
+    title: "Infrastructure & Ecosystem",
+    subtitle: "DevOps, Database e Strumenti",
+    icon: <Database className="text-rose-300" />, // Changed to Rose (Soft Red)
+    description: "Le fondamenta che garantiscono deployment, persistenza dei dati e versionamento del codice.",
+    skills: [
+      { name: "Docker", icon: <SiDocker />, color: "text-blue-500" },
+      { name: "Git", icon: <SiGit />, color: "text-orange-500" },
+      { name: "MySQL", icon: <SiMysql />, color: "text-blue-500" },
+      { name: "PostgreSQL", icon: <SiPostgresql />, color: "text-blue-300" },
+      { name: "Linux Env", icon: <SiLinux />, color: "text-yellow-200" },
+      { name: "Bash", icon: <SiGnubash />, color: "text-slate-200" }
+    ]
+  }
 ];
 
 const projects = [
@@ -95,7 +161,7 @@ const GlassCard = ({ children, className = "", hoverEffect = true }) => (
     whileHover={hoverEffect ? { y: -5, boxShadow: "0 20px 40px -10px rgba(225, 29, 72, 0.15)" } : {}}
     className={`bg-[#11112b]/60 backdrop-blur-xl border border-white/5 p-8 rounded-3xl overflow-hidden relative ${className}`}
   >
-    {/* Subtle gradient overlay */}
+    {/* Subtle gradient overlay - Red tinted */}
     <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
     {children}
   </motion.div>
@@ -141,7 +207,7 @@ const SnowOverlay = () => {
 };
 
 // --- COMPONENTE MACCHINA DA SCRIVERE ---
-const TypewriterEffect = ({ words }: { words: string[] }) => {
+const TypewriterEffect = ({ words }) => {
   const [index, setIndex] = useState(0);
   const [subIndex, setSubIndex] = useState(0);
   const [reverse, setReverse] = useState(false);
@@ -186,6 +252,7 @@ const TypewriterEffect = ({ words }: { words: string[] }) => {
   );
 };
 
+// --- MAIN COMPONENT ---
 export default function Portfolio() {
   const { scrollYProgress } = useScroll();
   const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
@@ -193,7 +260,7 @@ export default function Portfolio() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => setMousePosition({ x: e.clientX, y: e.clientY });
+    const handleMouseMove = (e) => setMousePosition({ x: e.clientX, y: e.clientY });
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
@@ -220,8 +287,8 @@ export default function Portfolio() {
           <img src="/favicon.svg" alt="MF Logo" className="w-8 h-8" />
         </a>
         <div className="flex gap-4">
-          <a href={portfolioData.social.github} target="_blank" className="p-2 bg-white/5 rounded-full hover:bg-white/10 hover:text-white transition-colors border border-white/5"><Github size={20}/></a>
-          <a href={portfolioData.social.linkedin} target="_blank" className="p-2 bg-white/5 rounded-full hover:bg-white/10 hover:text-white transition-colors border border-white/5"><Linkedin size={20}/></a>
+          <a href={portfolioData.social.github} target="_blank" rel="noreferrer" className="p-2 bg-white/5 rounded-full hover:bg-white/10 hover:text-white transition-colors border border-white/5"><Github size={20}/></a>
+          <a href={portfolioData.social.linkedin} target="_blank" rel="noreferrer" className="p-2 bg-white/5 rounded-full hover:bg-white/10 hover:text-white transition-colors border border-white/5"><Linkedin size={20}/></a>
           <a href={portfolioData.social.mail} className="p-2 bg-rose-600/80 text-white rounded-full hover:bg-rose-500 transition-colors shadow-lg shadow-rose-500/20"><Mail size={20}/></a>
         </div>
       </nav>
@@ -282,7 +349,6 @@ export default function Portfolio() {
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
             className="flex flex-wrap justify-center gap-4 pt-8 w-full px-4"
           >
-             {/* MODIFICA: Bottoni ottimizzati w-44 / w-full */}
              <a 
                href="#projects" 
                className="w-full sm:w-44 px-6 py-3 bg-white text-black font-bold rounded-full hover:scale-105 transition-transform flex justify-center items-center"
@@ -311,19 +377,67 @@ export default function Portfolio() {
         </motion.div>
       </Section>
 
-      {/* STACK & SKILLS */}
-      <div id="stack" className="w-full bg-[#0a0a1a] border-y border-white/5 py-12 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6">
-          <p className="text-center text-sm text-rose-300/80 font-mono mb-8 uppercase tracking-widest">Tecnologie & Strumenti</p>
-          <div className="flex flex-wrap justify-center gap-4">
-            {skills.map((skill, i) => (
-              <div key={i} className="px-4 py-2 bg-[#1a1a35] border border-red-500/20 rounded-lg text-slate-300 text-sm font-medium hover:border-rose-500/50 hover:text-white hover:shadow-[0_0_15px_rgba(225,29,72,0.3)] transition-all cursor-default">
-                {skill.name}
-              </div>
-            ))}
-          </div>
+      {/* STACK SECTION (Horizontal Tracks - Christmas Themed) */}
+      <Section id="stack">
+        <div className="flex flex-col items-center mb-16 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+            Competenze <span className="text-rose-500">Tecniche</span>
+          </h2>
+          {/* Christmas Gradient: Red to Amber */}
+          <div className="w-20 h-1.5 bg-gradient-to-r from-red-600 to-amber-500 rounded-full mb-6"></div>
+          <p className="text-slate-400 max-w-2xl text-lg">
+            Un profilo ibrido che unisce l'ingegneria del software moderna con solide basi di computer science.
+          </p>
         </div>
-      </div>
+
+        <div className="space-y-8">
+          {skillTracks.map((track, idx) => (
+            <GlassCard key={idx} className="!p-8 group" hoverEffect={false}>
+              <div className="flex flex-col lg:flex-row gap-8 items-start lg:items-center">
+                
+                {/* Info Categoria */}
+                <div className="lg:w-1/3 shrink-0">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="p-2.5 bg-white/5 rounded-xl border border-white/10 text-2xl">
+                      {track.icon}
+                    </div>
+                    <h3 className="text-xl font-bold text-white">{track.title}</h3>
+                  </div>
+                  {/* Changed text-violet-400 to text-rose-400 */}
+                  <p className="text-rose-400 font-mono text-xs uppercase tracking-wider mb-2">
+                    {track.subtitle}
+                  </p>
+                  <p className="text-slate-400 text-sm leading-relaxed">
+                    {track.description}
+                  </p>
+                </div>
+
+                {/* Griglia Icone */}
+                <div className="lg:w-2/3 flex flex-wrap gap-4">
+                  {track.skills.map((skill, sIdx) => (
+                    <div 
+                      key={sIdx} 
+                      // Changed bg/border colors to Rose theme
+                      className="relative group/icon flex items-center gap-3 px-4 py-3 bg-[#0a0a1a]/50 border border-white/5 rounded-xl hover:border-rose-500/30 hover:bg-rose-900/10 transition-all cursor-default"
+                    >
+                      <div className={`text-xl text-slate-400 transition-colors duration-300 group-hover/icon:${skill.color} group-hover/icon:scale-110`}>
+                        {skill.icon}
+                      </div>
+                      <span className="text-sm font-medium text-slate-300 group-hover/icon:text-white transition-colors">
+                        {skill.name}
+                      </span>
+                      
+                      {/* Glow effect on hover: changed to Rose */}
+                      <div className="absolute inset-0 rounded-xl bg-rose-500/5 opacity-0 group-hover/icon:opacity-100 transition-opacity pointer-events-none" />
+                    </div>
+                  ))}
+                </div>
+
+              </div>
+            </GlassCard>
+          ))}
+        </div>
+      </Section>
 
       {/* PROJECTS SECTION */}
       <Section id="projects">
@@ -332,7 +446,7 @@ export default function Portfolio() {
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Progetti <span className="text-rose-500">Rilevanti</span></h2>
             <p className="text-slate-400 max-w-lg">Una selezione di lavori che spaziano dal web development alla sicurezza informatica e algoritmica.</p>
           </div>
-          <a href="https://github.com/massimofedrigo" target="_blank" className="flex items-center gap-2 text-rose-400 hover:text-white transition-colors">
+          <a href="https://github.com/massimofedrigo" target="_blank" rel="noreferrer" className="flex items-center gap-2 text-rose-400 hover:text-white transition-colors">
             Vedi tutto su GitHub <ExternalLink size={16} />
           </a>
         </div>
@@ -344,7 +458,7 @@ export default function Portfolio() {
                 <div className="p-3 bg-white/5 rounded-xl border border-white/10 group-hover:border-rose-500/30 transition-colors">
                   {proj.icon}
                 </div>
-                <a href={proj.link} target="_blank" className="text-slate-500 hover:text-white transition-colors">
+                <a href={proj.link} target="_blank" rel="noreferrer" className="text-slate-500 hover:text-white transition-colors">
                   <ExternalLink size={20} />
                 </a>
               </div>
