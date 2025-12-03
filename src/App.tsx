@@ -268,6 +268,13 @@ export default function Portfolio() {
               "Math Geek"
             ]} />
           </div>
+
+          <motion.p 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed mt-4"
+          >
+            Trasformo complessi problemi matematici in <span className="text-white font-medium">software elegante e sicuro</span>.
+          </motion.p>
           
           <motion.div 
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
