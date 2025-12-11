@@ -171,7 +171,7 @@ export const translations: Record<Language, I18nSchema> = {
         desc: "Rete P2P decentralizzata per la condivisione di Threat Intelligence con sistema di trust e reputazione tra nodi.",
       },
       algowiki: {
-        title: "Algowiki.dev",
+        title: "AlgoWiki",
         desc: "Enciclopedia didattica di algoritmi con analisi di complessità, pseudocodice e dimostrazioni, pensata per studenti e sviluppatori che vogliono consolidare la teoria.",
       },
     },
@@ -288,7 +288,7 @@ export const translations: Record<Language, I18nSchema> = {
         desc: "Decentralized P2P network for sharing Threat Intelligence, with a trust and reputation system between nodes.",
       },
       algowiki: {
-        title: "Algowiki.dev",
+        title: "AlgoWiki",
         desc: "Didactic encyclopedia of algorithms with complexity analysis, pseudocode and proofs, for students and developers who want to strengthen theory.",
       },
     },
