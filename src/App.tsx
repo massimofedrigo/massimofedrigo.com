@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
+
 import {
   motion,
   useScroll,
@@ -56,25 +57,25 @@ import {
 
 import { FaJava } from "react-icons/fa";
 
-// --- DATA: PERSONAL DATA ---
+import { translations } from "./i18n";
+import type { Language } from "./i18n";
+
+// --- DATA: PERSONAL DATA (language-agnostic) ---
 const portfolioData = {
   name: "Massimo Fedrigo",
   location: "Cordenons, PN (Italy)",
-  bio: "Sviluppo architetture software scalabili e studio la matematica dietro gli algoritmi complessi. Attualmente focalizzato su Computational Modelling e Cybersecurity Offensiva.",
   social: {
     github: "https://github.com/massimofedrigo",
     linkedin: "https://www.linkedin.com/in/massimo-fedrigo-33424228a/",
-    mail: "mailto:massimofedrigo.dev@gmail.com"
-  }
+    mail: "mailto:massimofedrigo.dev@gmail.com",
+  },
 };
 
-// --- DATA: SKILLS (Horizontal Tracks) ---
+// --- DATA: SKILLS (icon + tech, language-agnostic) ---
 const skillTracks = [
   {
-    title: "Software Engineering & Product",
-    subtitle: "Sviluppo Full Stack Web & Mobile",
+    id: "software" as const,
     icon: <Layers className="text-fuchsia-400" />,
-    description: "Lo stack produttivo che utilizzo per costruire piattaforme scalabili, da app mobile cross-platform a backend complessi.",
     skills: [
       { name: "Dart", icon: <SiDart />, color: "text-blue-400" },
       { name: "Flutter", icon: <SiFlutter />, color: "text-cyan-400" },
@@ -85,14 +86,12 @@ const skillTracks = [
       { name: "PHP", icon: <SiPhp />, color: "text-indigo-400" },
       { name: "Symfony", icon: <SiSymfony />, color: "text-white" },
       { name: "Django", icon: <SiDjango />, color: "text-emerald-700" },
-      { name: "Flask", icon: <SiFlask />, color: "text-slate-300" }
-    ]
+      { name: "Flask", icon: <SiFlask />, color: "text-slate-300" },
+    ],
   },
   {
-    title: "Computer Science & Offensive Security",
-    subtitle: "Basso livello, Algoritmi e Pentesting",
+    id: "cs" as const,
     icon: <Terminal className="text-red-400" />,
-    description: "Il lato accademico e offensivo. Dal calcolo numerico ad alte prestazioni all'analisi delle vulnerabilità.",
     skills: [
       { name: "Python", icon: <SiPython />, color: "text-yellow-400" },
       { name: "C / C++", icon: <SiCplusplus />, color: "text-blue-600" },
@@ -102,85 +101,60 @@ const skillTracks = [
       { name: "Burp Suite", icon: <SiBurpsuite />, color: "text-orange-400" },
       { name: "Wireshark", icon: <SiWireshark />, color: "text-blue-300" },
       { name: "NumPy", icon: <SiNumpy />, color: "text-cyan-600" },
-      { name: "Pandas", icon: <SiPandas />, color: "text-purple-300" }
-    ]
+      { name: "Pandas", icon: <SiPandas />, color: "text-purple-300" },
+    ],
   },
   {
-    title: "Infrastruttura & Ecosistema",
-    subtitle: "DevOps, Database e Strumenti",
+    id: "infra" as const,
     icon: <Database className="text-cyan-400" />,
-    description: "Le fondamenta che garantiscono deployment, persistenza dei dati e versionamento del codice.",
     skills: [
       { name: "Docker", icon: <SiDocker />, color: "text-blue-500" },
       { name: "Git", icon: <SiGit />, color: "text-orange-500" },
       { name: "MySQL", icon: <SiMysql />, color: "text-blue-500" },
       { name: "PostgreSQL", icon: <SiPostgresql />, color: "text-blue-300" },
       { name: "Linux Env", icon: <SiLinux />, color: "text-yellow-200" },
-      { name: "Bash", icon: <SiGnubash />, color: "text-slate-200" }
-    ]
-  }
+      { name: "Bash", icon: <SiGnubash />, color: "text-slate-200" },
+    ],
+  },
 ];
 
-// --- DATA: PROJECTS ---
+type SkillTrackId = (typeof skillTracks)[number]["id"];
+
+// --- DATA: PROJECTS (icon + tech, language-agnostic) ---
 const projects = [
   {
-    title: "Overdiet",
-    desc: "Piattaforma Web & Mobile multi-utente per la gestione automatizzata di piani alimentari e protocolli nutrizionali, pensata per studi e professionisti del settore fitness.",
-    tech: ["PHP", "Symfony", "Javascript", "Node.js", "VUE.js", "Dart", "Flutter"],
+    id: "overdiet" as const,
+    icon: <Cpu className="text-pink-400" />,
     link: "https://overdiet.com",
-    icon: <Cpu className="text-pink-400" />
+    tech: ["PHP", "Symfony", "Javascript", "Node.js", "Vue.js", "Dart", "Flutter"],
   },
   {
-    title: "Stradella Fitness",
-    desc: "Soluzione Web & Mobile dedicata a un singolo brand fitness per la gestione strutturata di piani alimentari, esercizi e percorsi personalizzati dei clienti.",
-    tech: ["PHP", "Symfony", "Javascript", "Node.js", "VUE.js", "Dart", "Flutter"],
+    id: "stradella" as const,
+    icon: <Cpu className="text-pink-400" />,
     link: "https://stradellafitness.com",
-    icon: <Cpu className="text-pink-400" />
+    tech: ["PHP", "Symfony", "Javascript", "Node.js", "Vue.js", "Dart", "Flutter"],
   },
   {
-    title: "Synthetic Pages",
-    desc: "Generatore automatizzato di siti statici che sfrutta LLM e trend di ricerca Google per produrre contenuti SEO-oriented a partire da template dinamici.",
-    tech: ["Python", "Jinja2", "OpenAI API"],
+    id: "syntheticPages" as const,
+    icon: <Globe className="text-violet-400" />,
     link: "https://github.com/massimofedrigo/synthetic-pages",
-    icon: <Globe className="text-violet-400" />
+    tech: ["Python", "Jinja2", "OpenAI API"],
   },
   {
-    title: "Cyphermesh",
-    desc: "Rete P2P decentralizzata per la condivisione di Threat Intelligence con sistema di trust e reputazione tra nodi.",
-    tech: ["Python", "Flask", "C", "P2P"],
+    id: "cyphermesh" as const,
+    icon: <Network className="text-blue-400" />,
     link: "https://github.com/massimofedrigo/cyphermesh",
-    icon: <Network className="text-blue-400" />
+    tech: ["Python", "Flask", "C", "P2P"],
   },
   {
-    title: "Algowiki.dev",
-    desc: "Enciclopedia didattica di algoritmi con analisi di complessità, pseudocodice e dimostrazioni, pensata per studenti e sviluppatori che vogliono consolidare la teoria.",
-    tech: ["Markdown", "Mkdocs", "MathJax"],
+    id: "algowiki" as const,
+    icon: <BookOpen className="text-emerald-400" />,
     link: "https://algowiki.dev",
-    icon: <BookOpen className="text-emerald-400" />
-  }
+    tech: ["Markdown", "Mkdocs", "MathJax"],
+  },
 ];
 
-// --- DATA: EXPERIENCE ---
-const experience = [
-  {
-    year: "2025 - Presente",
-    role: "MSc Computational Mathematics",
-    company: "Università di Trieste",
-    desc: "Specializzazione in ottimizzazione numerica, machine learning e modellazione stocastica."
-  },
-  {
-    year: "2023 - Presente",
-    role: "Full Stack Developer Freelance",
-    company: "Progetti Vari",
-    desc: "Sviluppo di piattaforme complesse come Overdiet e Stradella Fitness. Migrazione legacy code, API Design, architetture backend e integrazione Mobile."
-  },
-  {
-    year: "2021 - 2025",
-    role: "BSc Informatica",
-    company: "Università di Udine",
-    desc: "Laurea triennale. Tesi: \"Algoritmo per il calcolo randomizzato della Singular Value Decomposition (SVD)\"."
-  }
-];
+type ProjectId = (typeof projects)[number]["id"];
 
 // --- COMPONENTI BASE ---
 
@@ -312,11 +286,10 @@ const DynamicBackground = () => {
   const rawX = useMotionValue(-200);
   const rawY = useMotionValue(-200);
 
-  // Spring molto più morbida
   const x = useSpring(rawX, {
-    stiffness: 30, // prima era tipo 80: abbassandolo rallenta tanto
-    damping: 25,   // ammortizzazione, evita overshoot
-    mass: 1.5,     // un po' di "peso" in più
+    stiffness: 30,
+    damping: 25,
+    mass: 1.5,
   });
 
   const y = useSpring(rawY, {
@@ -327,7 +300,7 @@ const DynamicBackground = () => {
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      const targetX = e.clientX - 200; // centro blob = mouse
+      const targetX = e.clientX - 200;
       const targetY = e.clientY - 200;
       rawX.set(targetX);
       rawY.set(targetY);
@@ -350,16 +323,28 @@ const DynamicBackground = () => {
   );
 };
 
-const Navbar = () => {
+const Navbar = ({
+  language,
+  onToggleLanguage,
+}: {
+  language: Language;
+  onToggleLanguage: () => void;
+}) => {
+  const t = translations[language].navbar;
+
   return (
     <nav
       className="fixed top-0 w-full z-50 px-6 py-6 flex justify-between items-center max-w-7xl mx-auto left-0 right-0"
       role="navigation"
-      aria-label="Navigazione principale"
+      aria-label={t.mainNav}
     >
       <a
         href="/"
-        aria-label="Torna alla homepage di Massimo Fedrigo"
+        aria-label={
+          language === "it"
+            ? "Torna alla homepage di Massimo Fedrigo"
+            : "Back to Massimo Fedrigo homepage"
+        }
         className="bg-white/5 p-2 rounded-full border border-white/5 backdrop-blur-md hover:bg-white/10 transition-colors shadow-lg shadow-violet-500/10"
       >
         <img
@@ -370,12 +355,12 @@ const Navbar = () => {
         />
       </a>
 
-      <div className="flex gap-4">
+      <div className="flex gap-4 items-center">
         <a
           href={portfolioData.social.github}
           target="_blank"
           rel="noreferrer"
-          aria-label="Apri il profilo GitHub"
+          aria-label={t.github}
           className="p-2 bg-white/5 rounded-full hover:bg-white/10 hover:text-white transition-colors border border-white/5"
         >
           <Github size={20} />
@@ -384,18 +369,41 @@ const Navbar = () => {
           href={portfolioData.social.linkedin}
           target="_blank"
           rel="noreferrer"
-          aria-label="Apri il profilo LinkedIn"
+          aria-label={t.linkedin}
           className="p-2 bg-white/5 rounded-full hover:bg-white/10 hover:text-white transition-colors border border-white/5"
         >
           <Linkedin size={20} />
         </a>
         <a
           href={portfolioData.social.mail}
-          aria-label="Invia una email"
+          aria-label={t.email}
           className="p-2 bg-violet-600/80 text-white rounded-full hover:bg-violet-500 transition-colors shadow-lg shadow-violet-500/20"
         >
           <Mail size={20} />
         </a>
+
+        {/* Language toggle */}
+        <button
+          type="button"
+          onClick={onToggleLanguage}
+          aria-label={t.langToggleLabel}
+          className="flex items-center text-xs font-mono rounded-full border border-white/10 bg-white/5 px-1 py-0.5 hover:border-violet-400 transition-colors"
+        >
+          <span
+            className={`px-2 py-0.5 rounded-full ${
+              language === "it" ? "bg-violet-600 text-white" : "text-slate-400"
+            }`}
+          >
+            IT
+          </span>
+          <span
+            className={`px-2 py-0.5 rounded-full ${
+              language === "en" ? "bg-violet-600 text-white" : "text-slate-400"
+            }`}
+          >
+            EN
+          </span>
+        </button>
       </div>
     </nav>
   );
@@ -404,13 +412,48 @@ const Navbar = () => {
 const HeroSection = ({
   opacity,
   scale,
+  language,
 }: {
   opacity: any;
   scale: any;
+  language: Language;
 }) => {
+  const t = translations[language].hero;
+
+  // Riferimenti ai due bottoni CTA
+  const primaryCtaRef = useRef<HTMLAnchorElement | null>(null);
+  const secondaryCtaRef = useRef<HTMLAnchorElement | null>(null);
+  const [ctaWidth, setCtaWidth] = useState<number | undefined>(undefined);
+
+  // Calcola la larghezza massima dei due bottoni (solo desktop, da sm in su)
+  useLayoutEffect(() => {
+    if (typeof window === "undefined") return;
+
+    // Su mobile lasciamo stare: bottoni full-width
+    if (window.innerWidth < 640) {
+      setCtaWidth(undefined);
+      return;
+    }
+
+    const primaryWidth = primaryCtaRef.current?.offsetWidth ?? 0;
+    const secondaryWidth = secondaryCtaRef.current?.offsetWidth ?? 0;
+    const max = Math.max(primaryWidth, secondaryWidth);
+
+    if (max > 0) {
+      setCtaWidth(max);
+    }
+  }, [language]); // ricalcola quando cambia lingua
+
+  const sharedCtaStyle = ctaWidth
+    ? { width: `${ctaWidth}px` }
+    : undefined;
+
   return (
     <Section className="min-h-screen flex flex-col justify-center items-center text-center pt-24">
-      <motion.header style={{ opacity, scale }} className="space-y-8 max-w-3xl flex flex-col items-center">
+      <motion.header
+        style={{ opacity, scale }}
+        className="space-y-8 max-w-3xl flex flex-col items-center"
+      >
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -418,7 +461,7 @@ const HeroSection = ({
           className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-950/30 border border-violet-500/30 text-violet-300 text-xs font-medium tracking-wider uppercase mb-4"
         >
           <span className="w-2 h-2 rounded-full bg-violet-400 animate-pulse" />
-          Disponibile
+          {t.availability}
         </motion.div>
 
         <motion.h1
@@ -432,14 +475,7 @@ const HeroSection = ({
         </motion.h1>
 
         <div className="text-lg md:text-2xl text-slate-400 h-8">
-          <TypewriterEffect
-            words={[
-              "Computer Scientist",
-              "Full Stack Developer",
-              "Cybersecurity Enthusiast",
-              "Matematica Computazionale",
-            ]}
-          />
+          <TypewriterEffect words={t.roleWords} />
         </div>
 
         <motion.p
@@ -448,7 +484,11 @@ const HeroSection = ({
           transition={{ duration: 0.8, delay: 0.2 }}
           className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed mt-4"
         >
-          {portfolioData.bio}
+          {t.bioPrefix}
+          <span className="text-white font-medium">
+            {t.bioHighlight}
+          </span>
+          {t.bioSuffix}
         </motion.p>
 
         <motion.div
@@ -458,18 +498,22 @@ const HeroSection = ({
           className="flex flex-wrap justify-center gap-4 pt-4 w-full px-4"
         >
           <a
+            ref={primaryCtaRef}
             href="#projects"
-            className="w-full sm:w-44 px-6 py-3 bg-white text-black font-bold rounded-full hover:scale-105 transition-transform flex justify-center items-center"
+            style={sharedCtaStyle}
+            className="w-full sm:w-auto px-6 py-3 bg-white text-black font-bold rounded-full hover:scale-105 transition-transform flex justify-center items-center whitespace-nowrap"
           >
-            Vedi progetti
+            {t.ctaProjects}
           </a>
 
           <a
+            ref={secondaryCtaRef}
             href="/cv.pdf"
             download
-            className="w-full sm:w-44 px-6 py-3 bg-violet-600 hover:bg-violet-500 text-white font-bold rounded-full hover:scale-105 transition-transform flex justify-center items-center gap-2 shadow-lg shadow-violet-900/20"
+            style={sharedCtaStyle}
+            className="w-full sm:w-auto px-6 py-3 bg-violet-600 hover:bg-violet-500 text-white font-bold rounded-full hover:scale-105 transition-transform flex justify-center items-center gap-2 shadow-lg shadow-violet-900/20 whitespace-nowrap"
           >
-            <FileText size={20} /> Scarica CV
+            <FileText size={20} /> {t.ctaCv}
           </a>
         </motion.div>
       </motion.header>
@@ -482,7 +526,7 @@ const HeroSection = ({
         <a
           href="#stack"
           className="cursor-pointer hover:text-white transition-colors"
-          aria-label="Vai alla sezione competenze tecniche"
+          aria-label={t.scrollDownLabel}
         >
           <ChevronDown size={24} />
         </a>
@@ -491,242 +535,333 @@ const HeroSection = ({
   );
 };
 
-const StackSection = () => (
-  <Section id="stack">
-    <div className="flex flex-col items-center mb-16 text-center">
-      <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-        Competenze <span className="text-violet-500">Tecniche</span>
-      </h2>
-      <div className="w-20 h-1.5 bg-gradient-to-r from-violet-500 to-cyan-500 rounded-full mb-6" />
-      <p className="text-slate-400 max-w-2xl text-lg">
-        Profilo ibrido che unisce ingegneria del software moderna e solide basi
-        di Computer Science, con esperienza su progetti reali in produzione.
-      </p>
-    </div>
+const StackSection = ({ language }: { language: Language }) => {
+  const t = translations[language];
 
-    <div className="space-y-8">
-      {skillTracks.map((track, idx) => (
-        <GlassCard key={idx} className="!p-8 group" hoverEffect={false}>
-          <div className="flex flex-col lg:flex-row gap-8 items-start lg:items-center">
-            {/* Info Categoria */}
-            <div className="lg:w-1/3 shrink-0">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="p-2.5 bg-white/5 rounded-xl border border-white/10 text-2xl">
-                  {track.icon}
-                </div>
-                <h3 className="text-xl font-bold text-white">{track.title}</h3>
-              </div>
-              <p className="text-violet-400 font-mono text-xs uppercase tracking-wider mb-2">
-                {track.subtitle}
-              </p>
-              <p className="text-slate-400 text-sm leading-relaxed">
-                {track.description}
-              </p>
-            </div>
-
-            {/* Griglia Icone */}
-            <div className="lg:w-2/3 flex flex-wrap gap-4">
-              {track.skills.map((skill, sIdx) => (
-                <div
-                  key={sIdx}
-                  className="relative group/icon flex items-center gap-3 px-4 py-3 bg-[#0a0a1a]/50 border border-white/5 rounded-xl hover:border-violet-500/30 hover:bg-violet-900/10 transition-all cursor-default"
-                >
-                  <div
-                    className={`text-xl text-slate-400 transition-all duration-300 group-hover/icon:${skill.color} group-hover/icon:scale-110`}
-                  >
-                    {skill.icon}
-                  </div>
-                  <span className="text-sm font-medium text-slate-300 group-hover/icon:text-white transition-colors">
-                    {skill.name}
-                  </span>
-
-                  <div className="absolute inset-0 rounded-xl bg-violet-500/5 opacity-0 group-hover/icon:opacity-100 transition-opacity pointer-events-none" />
-                </div>
-              ))}
-            </div>
-          </div>
-        </GlassCard>
-      ))}
-    </div>
-  </Section>
-);
-
-const ProjectsSection = () => (
-  <Section id="projects">
-    <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
-      <div>
-        <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-          Progetti <span className="text-violet-500">Rilevanti</span>
+  return (
+    <Section id="stack">
+      <div className="flex flex-col items-center mb-16 text-center">
+        <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+          {t.sections.skillsTitle}{" "}
+          <span className="text-violet-500">
+            {t.sections.skillsHighlight}
+          </span>
         </h2>
-        <p className="text-slate-400 max-w-lg">
-          Una selezione di lavori che spaziano dal web development alla
-          sicurezza, con focus su prodotti concreti e codice pronto per
-          l’ambiente di produzione.
+        <div className="w-20 h-1.5 bg-gradient-to-r from-violet-500 to-cyan-500 rounded-full mb-6" />
+        <p className="text-slate-400 max-w-2xl text-lg">
+          {t.sections.skillsIntro}
         </p>
       </div>
-      <a
-        href={portfolioData.social.github}
-        target="_blank"
-        rel="noreferrer"
-        className="flex items-center gap-2 text-violet-400 hover:text-white transition-colors"
-        aria-label="Apri tutti i progetti su GitHub"
-      >
-        Vedi tutto su GitHub <ExternalLink size={16} />
-      </a>
-    </div>
 
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {projects.map((proj, i) => (
-        <GlassCard key={i} className="group flex flex-col h-full">
-          <div className="flex justify-between items-start mb-6">
-            <div className="p-3 bg-white/5 rounded-xl border border-white/10 group-hover:border-violet-500/30 transition-colors">
-              {proj.icon}
-            </div>
-            <a
-              href={proj.link}
-              target="_blank"
-              rel="noreferrer"
-              className="text-slate-500 hover:text-white transition-colors"
-              aria-label={`Apri il progetto ${proj.title}`}
-            >
-              <ExternalLink size={20} />
-            </a>
-          </div>
+      <div className="space-y-8">
+        {skillTracks.map((track) => {
+          const skillText = t.skills[track.id as SkillTrackId];
 
-          <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-violet-300 transition-colors">
-            {proj.title}
-          </h3>
-          <p className="text-slate-400 text-sm leading-relaxed mb-6 flex-grow">
-            {proj.desc}
+          return (
+            <GlassCard key={track.id} className="!p-8 group" hoverEffect={false}>
+              <div className="flex flex-col lg:flex-row gap-8 items-start lg:items-center">
+                {/* Info Categoria */}
+                <div className="lg:w-1/3 shrink-0">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="p-2.5 bg-white/5 rounded-xl border border-white/10 text-2xl">
+                      {track.icon}
+                    </div>
+                    <h3 className="text-xl font-bold text-white">
+                      {skillText.title}
+                    </h3>
+                  </div>
+                  <p className="text-violet-400 font-mono text-xs uppercase tracking-wider mb-2">
+                    {skillText.subtitle}
+                  </p>
+                  <p className="text-slate-400 text-sm leading-relaxed">
+                    {skillText.description}
+                  </p>
+                </div>
+
+                {/* Griglia Icone */}
+                <div className="lg:w-2/3 flex flex-wrap gap-4">
+                  {track.skills.map((skill, sIdx) => (
+                    <div
+                      key={sIdx}
+                      className="relative group/icon flex items-center gap-3 px-4 py-3 bg-[#0a0a1a]/50 border border-white/5 rounded-xl hover:border-violet-500/30 hover:bg-violet-900/10 transition-all cursor-default"
+                    >
+                      <div
+                        className={`text-xl text-slate-400 transition-all duration-300 group-hover/icon:${skill.color} group-hover/icon:scale-110`}
+                      >
+                        {skill.icon}
+                      </div>
+                      <span className="text-sm font-medium text-slate-300 group-hover/icon:text-white transition-colors">
+                        {skill.name}
+                      </span>
+
+                      <div className="absolute inset-0 rounded-xl bg-violet-500/5 opacity-0 group-hover/icon:opacity-100 transition-opacity pointer-events-none" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </GlassCard>
+          );
+        })}
+      </div>
+    </Section>
+  );
+};
+
+const ProjectsSection = ({ language }: { language: Language }) => {
+  const t = translations[language];
+
+  return (
+    <Section id="projects">
+      <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
+        <div>
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            {t.sections.projectsTitle}{" "}
+            <span className="text-violet-500">
+              {t.sections.projectsHighlight}
+            </span>
+          </h2>
+          <p className="text-slate-400 max-w-lg">
+            {t.sections.projectsIntro}
+          </p>
+        </div>
+        <a
+          href={portfolioData.social.github}
+          target="_blank"
+          rel="noreferrer"
+          className="flex items-center gap-2 text-violet-400 hover:text-white transition-colors"
+          aria-label={t.sections.projectsGithubLink}
+        >
+          {t.sections.projectsGithubLink} <ExternalLink size={16} />
+        </a>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {projects.map((proj) => {
+          const projText = t.projects[proj.id as ProjectId];
+
+          return (
+            <GlassCard key={proj.id} className="group flex flex-col h-full">
+              <div className="flex justify-between items-start mb-6">
+                <div className="p-3 bg-white/5 rounded-xl border border-white/10 group-hover:border-violet-500/30 transition-colors">
+                  {proj.icon}
+                </div>
+                <a
+                  href={proj.link}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-slate-500 hover:text-white transition-colors"
+                  aria-label={`${
+                    language === "it" ? "Apri il progetto" : "Open project"
+                  } ${projText.title}`}
+                >
+                  <ExternalLink size={20} />
+                </a>
+              </div>
+
+              <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-violet-300 transition-colors">
+                {projText.title}
+              </h3>
+              <p className="text-slate-400 text-sm leading-relaxed mb-6 flex-grow">
+                {projText.desc}
+              </p>
+
+              <div className="flex flex-wrap gap-2 pt-4 border-t border-white/5">
+                {proj.tech.map((tTech, k) => (
+                  <span
+                    key={k}
+                    className="text-xs font-mono text-violet-300/80 bg-violet-900/20 px-2 py-1 rounded"
+                  >
+                    {tTech}
+                  </span>
+                ))}
+              </div>
+            </GlassCard>
+          );
+        })}
+      </div>
+    </Section>
+  );
+};
+
+const AboutSection = ({ language }: { language: Language }) => {
+  const t = translations[language];
+  const about = t.about;
+  const sections = t.sections;
+
+  return (
+    <Section id="about">
+      <div className="grid lg:grid-cols-3 gap-12">
+        {/* Left Column: Bio */}
+        <div className="lg:col-span-1 space-y-6">
+          <h2 className="text-3xl font-bold text-white">
+            {sections.aboutTitle}
+          </h2>
+          <div className="w-16 h-1 bg-gradient-to-r from-violet-500 to-cyan-500 rounded-full" />
+
+          <p className="text-slate-400 leading-relaxed">
+            {about.intro1Prefix}
+            <span className="text-white">
+              {about.intro1Highlight}
+            </span>
+            {about.intro1Suffix}
           </p>
 
-          <div className="flex flex-wrap gap-2 pt-4 border-t border-white/5">
-            {proj.tech.map((t, k) => (
-              <span
-                key={k}
-                className="text-xs font-mono text-violet-300/80 bg-violet-900/20 px-2 py-1 rounded"
+          <p className="text-slate-400 leading-relaxed">
+            {about.intro2}
+          </p>
+
+          <GlassCard className="mt-8 !p-6 !bg-gradient-to-br from-violet-900/20 to-transparent border-violet-500/20">
+            <h4 className="flex items-center gap-2 text-white font-bold mb-2">
+              <Shield size={18} className="text-emerald-400" />{" "}
+              {sections.focusTitle}
+            </h4>
+            <p className="text-sm text-slate-400">
+              {about.focus.prefix}
+              <strong className="text-white">
+                {about.focus.highlight1}
+              </strong>
+              {about.focus.middle}
+              <strong className="text-white">
+                {about.focus.highlight2}
+              </strong>
+              {about.focus.suffix}
+            </p>
+          </GlassCard>
+        </div>
+
+        {/* Right Column: Timeline */}
+        <div className="lg:col-span-2">
+          <h2 className="text-3xl font-bold text-white mb-8">
+            {sections.journeyTitle}
+          </h2>
+          <div className="space-y-6">
+            {t.experience.map((exp, i) => (
+              <div
+                key={i}
+                className="group relative pl-8 border-l border-white/10 hover:border-violet-500/50 transition-colors pb-2"
               >
-                {t}
-              </span>
+                <div className="absolute -left-[5px] top-2 w-2.5 h-2.5 rounded-full bg-slate-800 border border-slate-600 group-hover:bg-violet-500 group-hover:border-violet-400 transition-all shadow-[0_0_0_4px_rgba(3,0,20,1)]" />
+
+                <span className="text-xs font-mono text-violet-400 mb-1 block">
+                  {exp.year}
+                </span>
+                <h3 className="text-xl font-bold text-white">
+                  {exp.role}
+                </h3>
+                <div className="text-sm text-slate-500 font-medium mb-2">
+                  {exp.company}
+                </div>
+                <p className="text-slate-400 text-sm max-w-xl">
+                  {exp.desc}
+                </p>
+              </div>
             ))}
           </div>
-        </GlassCard>
-      ))}
-    </div>
-  </Section>
-);
-
-const AboutSection = () => (
-  <Section id="about">
-    <div className="grid lg:grid-cols-3 gap-12">
-      {/* Left Column: Bio */}
-      <div className="lg:col-span-1 space-y-6">
-        <h2 className="text-3xl font-bold text-white">Chi sono</h2>
-        <div className="w-16 h-1 bg-gradient-to-r from-violet-500 to-cyan-500 rounded-full" />
-        <p className="text-slate-400 leading-relaxed">
-          Sono un <span className="text-white">Computer Scientist</span> con
-          una forte passione per la matematica applicata e la
-          cybersecurity. Mi piace lavorare su problemi complessi, dal modello
-          matematico fino al codice che gira in produzione.
-        </p>
-        <p className="text-slate-400 leading-relaxed">
-          Mi distinguo per un approccio ibrido: scrivo codice pulito e
-          manutenibile (Ingegneria del Software), ma capisco la teoria alla
-          base di algoritmi, sistemi e sicurezza (Computer Science).
-        </p>
-
-        <GlassCard className="mt-8 !p-6 !bg-gradient-to-br from-violet-900/20 to-transparent border-violet-500/20">
-          <h4 className="flex items-center gap-2 text-white font-bold mb-2">
-            <Shield size={18} className="text-emerald-400" /> Focus attuale
-          </h4>
-          <p className="text-sm text-slate-400">
-            Sto preparando la certificazione offensiva{" "}
-            <strong className="text-white">OSCP</strong> e completando la
-            magistrale in{" "}
-            <strong className="text-white">Computational Mathematics</strong>, con l’obiettivo di portare rigore
-            matematico e sicurezza avanzata dentro prodotti digitali reali.
-          </p>
-        </GlassCard>
-      </div>
-
-      {/* Right Column: Timeline */}
-      <div className="lg:col-span-2">
-        <h2 className="text-3xl font-bold text-white mb-8">Percorso</h2>
-        <div className="space-y-6">
-          {experience.map((exp, i) => (
-            <div
-              key={i}
-              className="group relative pl-8 border-l border-white/10 hover:border-violet-500/50 transition-colors pb-2"
-            >
-              <div className="absolute -left-[5px] top-2 w-2.5 h-2.5 rounded-full bg-slate-800 border border-slate-600 group-hover:bg-violet-500 group-hover:border-violet-400 transition-all shadow-[0_0_0_4px_rgba(3,0,20,1)]" />
-
-              <span className="text-xs font-mono text-violet-400 mb-1 block">
-                {exp.year}
-              </span>
-              <h3 className="text-xl font-bold text-white">{exp.role}</h3>
-              <div className="text-sm text-slate-500 font-medium mb-2">
-                {exp.company}
-              </div>
-              <p className="text-slate-400 text-sm max-w-xl">{exp.desc}</p>
-            </div>
-          ))}
         </div>
       </div>
-    </div>
-  </Section>
-);
+    </Section>
+  );
+};
 
-const Footer = () => (
-  <footer className="py-8 border-t border-white/5 bg-[#01010a] text-center mt-8">
-    <div className="flex justify-center gap-6 mb-6" aria-label="Link social">
-      <a
-        href={portfolioData.social.github}
-        className="text-slate-500 hover:text-white transition-colors"
-        aria-label="Profilo GitHub"
-      >
-        <Github size={20} />
-      </a>
-      <a
-        href={portfolioData.social.linkedin}
-        className="text-slate-500 hover:text-white transition-colors"
-        aria-label="Profilo LinkedIn"
-      >
-        <Linkedin size={20} />
-      </a>
-      <a
-        href={portfolioData.social.mail}
-        className="text-slate-500 hover:text-white transition-colors"
-        aria-label="Invia una email"
-      >
-        <Mail size={20} />
-      </a>
-    </div>
-    <p className="text-slate-600 text-xs font-mono">
-      © {new Date().getFullYear()} {portfolioData.name}. Built with React,
-      Tailwind &amp; Framer Motion.
-    </p>
-  </footer>
-);
+const Footer = ({ language }: { language: Language }) => {
+  const t = translations[language];
+
+  return (
+    <footer className="py-8 border-t border-white/5 bg-[#01010a] text-center mt-8">
+      <div className="flex justify-center gap-6 mb-6" aria-label="Social links">
+        <a
+          href={portfolioData.social.github}
+          className="text-slate-500 hover:text-white transition-colors"
+          aria-label={language === "it" ? "Profilo GitHub" : "GitHub profile"}
+        >
+          <Github size={20} />
+        </a>
+        <a
+          href={portfolioData.social.linkedin}
+          className="text-slate-500 hover:text-white transition-colors"
+          aria-label={
+            language === "it" ? "Profilo LinkedIn" : "LinkedIn profile"
+          }
+        >
+          <Linkedin size={20} />
+        </a>
+        <a
+          href={portfolioData.social.mail}
+          className="text-slate-500 hover:text-white transition-colors"
+          aria-label={language === "it" ? "Invia una email" : "Send an email"}
+        >
+          <Mail size={20} />
+        </a>
+      </div>
+      <p className="text-slate-600 text-xs font-mono">
+        © {new Date().getFullYear()} {portfolioData.name}.{" "}
+        {t.footer.builtWith}
+      </p>
+    </footer>
+  );
+};
 
 // --- MAIN COMPONENT ---
+
 export default function Portfolio() {
   const { scrollYProgress } = useScroll();
   const heroOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
   const heroScale = useTransform(scrollYProgress, [0, 0.2], [1, 0.95]);
 
+  const [language, setLanguage] = useState<Language>(() => {
+    if (typeof window === "undefined") {
+      // SSR / durante build: fallback sicuro
+      return "en";
+    }
+
+    // 1) Prima scelta: ultima lingua salvata dall'utente
+    const stored = window.localStorage.getItem("lang");
+    if (stored === "it" || stored === "en") {
+      return stored as Language;
+    }
+
+    // 2) Se non c'è nulla in localStorage, usa lingua del browser
+    const browserLang =
+      navigator.language || (navigator.languages && navigator.languages[0]);
+
+    if (browserLang) {
+      const code2 = browserLang.slice(0, 2).toLowerCase();
+      return code2 === "it" ? "it" : "en";
+    }
+
+    // 3) Fallback finale
+    return "en";
+  });
+
+  // Sincronizza DOM + localStorage ogni volta che language cambia
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    document.documentElement.lang = language;
+    window.localStorage.setItem("lang", language);
+  }, [language]);
+
+
+  const handleToggleLanguage = () => {
+    setLanguage((prev) => (prev === "it" ? "en" : "it"));
+  };
+
   return (
     <div className="min-h-screen bg-[#030014] text-slate-300 font-sans overflow-x-hidden selection:bg-violet-500/30 selection:text-white">
       <DynamicBackground />
-      <Navbar />
+      <Navbar language={language} onToggleLanguage={handleToggleLanguage} />
 
       <main>
-        <HeroSection opacity={heroOpacity} scale={heroScale} />
-        <StackSection />
-        <ProjectsSection />
-        <AboutSection />
+        <HeroSection
+          opacity={heroOpacity}
+          scale={heroScale}
+          language={language}
+        />
+        <StackSection language={language} />
+        <ProjectsSection language={language} />
+        <AboutSection language={language} />
       </main>
 
-      <Footer />
+      <Footer language={language} />
     </div>
   );
 }
