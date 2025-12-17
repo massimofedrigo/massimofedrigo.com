@@ -67,7 +67,7 @@ const portfolioData = {
   social: {
     github: "https://github.com/massimofedrigo",
     linkedin: "https://www.linkedin.com/in/massimo-fedrigo-33424228a/",
-    mail: "mailto:massimofedrigo.dev@gmail.com",
+    mail: "mailto:contact@massimofedrigo.com",
   },
 };
 
@@ -508,7 +508,7 @@ const HeroSection = ({
 
           <a
             ref={secondaryCtaRef}
-            href="/cv.pdf"
+            href={language === "it" ? "/cv_ita.pdf" : "/cv_eng.pdf"}
             download
             style={sharedCtaStyle}
             className="w-full sm:w-auto px-6 py-3 bg-violet-600 hover:bg-violet-500 text-white font-bold rounded-full hover:scale-105 transition-transform flex justify-center items-center gap-2 shadow-lg shadow-violet-900/20 whitespace-nowrap"
