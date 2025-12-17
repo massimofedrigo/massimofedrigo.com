@@ -561,7 +561,7 @@ const HeroSection = ({
 
           <a
             ref={secondaryCtaRef}
-            href={language === "it" ? "/cv_ita.pdf" : "/cv_eng.pdf"}
+            href={language === "it" ? "/massimo_fedrigo_cv_ita.pdf" : "/massimo_fedrigo_cv_eng.pdf"}
             download
             style={sharedCtaStyle}
             className="w-full sm:w-auto px-6 py-3 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-full hover:scale-105 transition-transform flex justify-center items-center gap-2 shadow-lg shadow-rose-900/20 whitespace-nowrap"
