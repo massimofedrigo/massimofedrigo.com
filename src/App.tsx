@@ -1,9 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  useLayoutEffect,
-} from "react";
+import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 
 import {
   motion,
@@ -80,7 +75,7 @@ const portfolioData = {
 const skillTracks = [
   {
     id: "software" as const,
-    icon: <Layers className="text-amber-400" />,
+    icon: <Layers className="text-fuchsia-400" />,
     skills: [
       { name: "Dart", icon: <SiDart />, color: "text-blue-400" },
       { name: "Flutter", icon: <SiFlutter />, color: "text-cyan-400" },
@@ -96,7 +91,7 @@ const skillTracks = [
   },
   {
     id: "cs" as const,
-    icon: <Terminal className="text-red-500" />,
+    icon: <Terminal className="text-red-400" />,
     skills: [
       { name: "Python", icon: <SiPython />, color: "text-yellow-400" },
       { name: "C / C++", icon: <SiCplusplus />, color: "text-blue-600" },
@@ -111,7 +106,7 @@ const skillTracks = [
   },
   {
     id: "infra" as const,
-    icon: <Database className="text-rose-300" />,
+    icon: <Database className="text-cyan-400" />,
     skills: [
       { name: "Docker", icon: <SiDocker />, color: "text-blue-500" },
       { name: "Git", icon: <SiGit />, color: "text-orange-500" },
@@ -129,31 +124,31 @@ type SkillTrackId = (typeof skillTracks)[number]["id"];
 const projects = [
   {
     id: "overdiet" as const,
-    icon: <Cpu className="text-rose-400" />,
+    icon: <Cpu className="text-pink-400" />,
     link: "https://overdiet.com",
     tech: ["PHP", "Symfony", "Javascript", "Node.js", "Vue.js", "Dart", "Flutter"],
   },
   {
     id: "stradella" as const,
-    icon: <Cpu className="text-rose-400" />,
+    icon: <Cpu className="text-pink-400" />,
     link: "https://stradellafitness.com",
     tech: ["PHP", "Symfony", "Javascript", "Node.js", "Vue.js", "Dart", "Flutter"],
   },
   {
     id: "syntheticPages" as const,
-    icon: <Globe className="text-rose-400" />,
+    icon: <Globe className="text-violet-400" />,
     link: "https://github.com/massimofedrigo/synthetic-pages",
     tech: ["Python", "Jinja2", "OpenAI API"],
   },
   {
     id: "cyphermesh" as const,
-    icon: <Network className="text-rose-400" />,
+    icon: <Network className="text-blue-400" />,
     link: "https://github.com/massimofedrigo/cyphermesh",
     tech: ["Python", "Flask", "C", "P2P"],
   },
   {
     id: "algowiki" as const,
-    icon: <BookOpen className="text-rose-400" />,
+    icon: <BookOpen className="text-emerald-400" />,
     link: "https://algowiki.dev",
     tech: ["Markdown", "Mkdocs", "MathJax"],
   },
@@ -194,13 +189,13 @@ const GlassCard = ({
       hoverEffect
         ? {
             y: -5,
-            boxShadow: "0 20px 40px -10px rgba(225, 29, 72, 0.15)",
+            boxShadow: "0 20px 40px -10px rgba(124, 58, 237, 0.15)",
           }
         : {}
     }
     className={`bg-[#11112b]/60 backdrop-blur-xl border border-white/5 p-8 rounded-3xl overflow-hidden relative ${className}`}
   >
-    <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
     {children}
   </motion.div>
 );
@@ -213,7 +208,7 @@ const GradientText = ({
   className?: string;
 }) => (
   <span
-    className={`bg-clip-text text-transparent bg-gradient-to-r from-red-600 via-rose-500 to-amber-400 ${className}`}
+    className={`bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-400 ${className}`}
   >
     {children}
   </span>
@@ -235,13 +230,13 @@ const TypewriterEffect = ({
   const [reverse, setReverse] = useState(false);
   const [blink, setBlink] = useState(true);
 
+  // Cursore lampeggiante
   useEffect(() => {
-    const timeout2 = setTimeout(() => {
-      setBlink((prev) => !prev);
-    }, 500);
+    const timeout2 = setTimeout(() => setBlink((prev) => !prev), 500);
     return () => clearTimeout(timeout2);
   }, [blink]);
 
+  // Logica di scrittura
   useEffect(() => {
     if (index >= words.length) {
       setIndex(0);
@@ -276,7 +271,7 @@ const TypewriterEffect = ({
       <span
         className={`${
           blink ? "opacity-100" : "opacity-0"
-        } text-rose-500 font-bold ml-1`}
+        } text-violet-500 font-bold ml-1`}
       >
         |
       </span>
@@ -284,50 +279,10 @@ const TypewriterEffect = ({
   );
 };
 
-// --- SNOW OVERLAY (Christmas effect) ---
-
-const SnowOverlay = () => {
-  const flakes = Array.from({ length: 30 });
-
-  const width =
-    typeof window !== "undefined" ? window.innerWidth : 1000;
-  const height =
-    typeof window !== "undefined" ? window.innerHeight : 1000;
-
-  return (
-    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-      {flakes.map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute bg-white rounded-full opacity-20"
-          initial={{
-            x: Math.random() * width,
-            y: -20,
-            opacity: 0,
-          }}
-          animate={{
-            y: height + 20,
-            opacity: [0, 0.4, 0],
-          }}
-          transition={{
-            duration: 5 + Math.random() * 10,
-            repeat: Infinity,
-            delay: Math.random() * 5,
-            ease: "linear",
-          }}
-          style={{
-            width: Math.random() * 3 + 1,
-            height: Math.random() * 3 + 1,
-          }}
-        />
-      ))}
-    </div>
-  );
-};
-
 // --- COMPONENTI STRUTTURALI ---
 
 const DynamicBackground = () => {
+  // Motion values "grezzi"
   const rawX = useMotionValue(-200);
   const rawY = useMotionValue(-200);
 
@@ -357,11 +312,11 @@ const DynamicBackground = () => {
 
   return (
     <div className="fixed inset-0 z-0 pointer-events-none">
-      <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-red-900/20 rounded-full blur-[120px]" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-amber-900/10 rounded-full blur-[100px]" />
+      <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-violet-900/20 rounded-full blur-[120px]" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-cyan-900/10 rounded-full blur-[100px]" />
 
       <motion.div
-        className="absolute w-[400px] h-[400px] bg-rose-600/10 rounded-full blur-[100px]"
+        className="absolute w-[400px] h-[400px] bg-indigo-600/10 rounded-full blur-[100px]"
         style={{ x, y }}
       />
     </div>
@@ -390,7 +345,7 @@ const Navbar = ({
             ? "Torna alla homepage di Massimo Fedrigo"
             : "Back to Massimo Fedrigo homepage"
         }
-        className="bg-white/5 p-2 rounded-full border border-white/5 backdrop-blur-md hover:bg-white/10 transition-colors shadow-lg shadow-red-500/10"
+        className="bg-white/5 p-2 rounded-full border border-white/5 backdrop-blur-md hover:bg-white/10 transition-colors shadow-lg shadow-violet-500/10"
       >
         <img
           src="/favicon.svg"
@@ -422,7 +377,7 @@ const Navbar = ({
         <a
           href={portfolioData.social.mail}
           aria-label={t.email}
-          className="p-2 bg-rose-600/80 text-white rounded-full hover:bg-rose-500 transition-colors shadow-lg shadow-rose-500/20"
+          className="p-2 bg-violet-600/80 text-white rounded-full hover:bg-violet-500 transition-colors shadow-lg shadow-violet-500/20"
         >
           <Mail size={20} />
         </a>
@@ -432,18 +387,18 @@ const Navbar = ({
           type="button"
           onClick={onToggleLanguage}
           aria-label={t.langToggleLabel}
-          className="flex items-center text-xs font-mono rounded-full border border-white/10 bg-white/5 px-1 py-0.5 hover:border-rose-400 transition-colors"
+          className="flex items-center text-xs font-mono rounded-full border border-white/10 bg-white/5 px-1 py-0.5 hover:border-violet-400 transition-colors"
         >
           <span
             className={`px-2 py-0.5 rounded-full ${
-              language === "it" ? "bg-rose-600 text-white" : "text-slate-400"
+              language === "it" ? "bg-violet-600 text-white" : "text-slate-400"
             }`}
           >
             IT
           </span>
           <span
             className={`px-2 py-0.5 rounded-full ${
-              language === "en" ? "bg-rose-600 text-white" : "text-slate-400"
+              language === "en" ? "bg-violet-600 text-white" : "text-slate-400"
             }`}
           >
             EN
@@ -465,13 +420,16 @@ const HeroSection = ({
 }) => {
   const t = translations[language].hero;
 
+  // Riferimenti ai due bottoni CTA
   const primaryCtaRef = useRef<HTMLAnchorElement | null>(null);
   const secondaryCtaRef = useRef<HTMLAnchorElement | null>(null);
   const [ctaWidth, setCtaWidth] = useState<number | undefined>(undefined);
 
+  // Calcola la larghezza massima dei due bottoni (solo desktop, da sm in su)
   useLayoutEffect(() => {
     if (typeof window === "undefined") return;
 
+    // Su mobile lasciamo stare: bottoni full-width
     if (window.innerWidth < 640) {
       setCtaWidth(undefined);
       return;
@@ -484,48 +442,37 @@ const HeroSection = ({
     if (max > 0) {
       setCtaWidth(max);
     }
-  }, [language]);
+  }, [language]); // ricalcola quando cambia lingua
 
-  const sharedCtaStyle = ctaWidth ? { width: `${ctaWidth}px` } : undefined;
+  const sharedCtaStyle = ctaWidth
+    ? { width: `${ctaWidth}px` }
+    : undefined;
 
   return (
-    <Section className="min-h-screen flex flex-col justify-center items-center text-center pt-24 relative">
+    <Section className="min-h-screen flex flex-col justify-center items-center text-center pt-24">
       <motion.header
         style={{ opacity, scale }}
-        className="space-y-8 max-w-3xl relative z-10 flex flex-col items-center"
+        className="space-y-8 max-w-3xl flex flex-col items-center"
       >
-        {/* Badge natalizio (decorativo, non tradotto) */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-950/80 border border-amber-500/50 text-red-100 text-sm font-bold tracking-wider uppercase mb-2 shadow-[0_0_15px_rgba(245,158,11,0.2)] backdrop-blur-md"
+          className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-950/30 border border-violet-500/30 text-violet-300 text-xs font-medium tracking-wider uppercase mb-4"
         >
-          <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.8)]" />
-          Merry Coding 🎄
+          <span className="w-2 h-2 rounded-full bg-violet-400 animate-pulse" />
+          {t.availability}
         </motion.div>
 
-        <div className="relative inline-block mt-4">
-          <motion.span
-            initial={{ opacity: 0, y: -20, rotate: -20 }}
-            animate={{ opacity: 1, y: 0, rotate: -12 }}
-            transition={{ delay: 0.5, type: "spring" }}
-            className="absolute -top-7 -left-4 md:-top-10 md:-left-6 text-5xl md:text-7xl z-20 cursor-default"
-            style={{ filter: "drop-shadow(0 0 10px rgba(255,0,0,0.5))" }}
-          >
-            🎅
-          </motion.span>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.1 }}
-            className="text-6xl md:text-8xl font-bold text-white tracking-tight leading-none relative z-10"
-          >
-            {portfolioData.name.split(" ")[0]} <br />
-            <GradientText>{portfolioData.name.split(" ")[1]}</GradientText>
-          </motion.h1>
-        </div>
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.1 }}
+          className="text-6xl md:text-8xl font-bold text-white tracking-tight leading-none"
+        >
+          {portfolioData.name.split(" ")[0]} <br />
+          <GradientText>{portfolioData.name.split(" ")[1]}</GradientText>
+        </motion.h1>
 
         <div className="text-lg md:text-2xl text-slate-400 h-8">
           <TypewriterEffect words={t.roleWords} />
@@ -548,7 +495,7 @@ const HeroSection = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="flex flex-wrap justify-center gap-4 pt-8 w-full px-4"
+          className="flex flex-wrap justify-center gap-4 pt-4 w-full px-4"
         >
           <a
             ref={primaryCtaRef}
@@ -564,12 +511,9 @@ const HeroSection = ({
             href={language === "it" ? "/massimo_fedrigo_cv_ita.pdf" : "/massimo_fedrigo_cv_eng.pdf"}
             download
             style={sharedCtaStyle}
-            className="w-full sm:w-auto px-6 py-3 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-full hover:scale-105 transition-transform flex justify-center items-center gap-2 shadow-lg shadow-rose-900/20 whitespace-nowrap"
+            className="w-full sm:w-auto px-6 py-3 bg-violet-600 hover:bg-violet-500 text-white font-bold rounded-full hover:scale-105 transition-transform flex justify-center items-center gap-2 shadow-lg shadow-violet-900/20 whitespace-nowrap"
           >
-            <span className="flex-shrink-0">
-              <FileText size={20} />
-            </span>
-            {t.ctaCv}
+            <FileText size={20} /> {t.ctaCv}
           </a>
         </motion.div>
       </motion.header>
@@ -599,11 +543,11 @@ const StackSection = ({ language }: { language: Language }) => {
       <div className="flex flex-col items-center mb-16 text-center">
         <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
           {t.sections.skillsTitle}{" "}
-          <span className="text-rose-500">
+          <span className="text-violet-500">
             {t.sections.skillsHighlight}
           </span>
         </h2>
-        <div className="w-20 h-1.5 bg-gradient-to-r from-red-600 to-amber-500 rounded-full mb-6" />
+        <div className="w-20 h-1.5 bg-gradient-to-r from-violet-500 to-cyan-500 rounded-full mb-6" />
         <p className="text-slate-400 max-w-2xl text-lg">
           {t.sections.skillsIntro}
         </p>
@@ -616,6 +560,7 @@ const StackSection = ({ language }: { language: Language }) => {
           return (
             <GlassCard key={track.id} className="!p-8 group" hoverEffect={false}>
               <div className="flex flex-col lg:flex-row gap-8 items-start lg:items-center">
+                {/* Info Categoria */}
                 <div className="lg:w-1/3 shrink-0">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="p-2.5 bg-white/5 rounded-xl border border-white/10 text-2xl">
@@ -625,7 +570,7 @@ const StackSection = ({ language }: { language: Language }) => {
                       {skillText.title}
                     </h3>
                   </div>
-                  <p className="text-rose-400 font-mono text-xs uppercase tracking-wider mb-2">
+                  <p className="text-violet-400 font-mono text-xs uppercase tracking-wider mb-2">
                     {skillText.subtitle}
                   </p>
                   <p className="text-slate-400 text-sm leading-relaxed">
@@ -633,11 +578,12 @@ const StackSection = ({ language }: { language: Language }) => {
                   </p>
                 </div>
 
+                {/* Griglia Icone */}
                 <div className="lg:w-2/3 flex flex-wrap gap-4">
                   {track.skills.map((skill, sIdx) => (
                     <div
                       key={sIdx}
-                      className="relative group/icon flex items-center gap-3 px-4 py-3 bg-[#0a0a1a]/50 border border-white/5 rounded-xl hover:border-rose-500/30 hover:bg-rose-900/10 transition-all cursor-default"
+                      className="relative group/icon flex items-center gap-3 px-4 py-3 bg-[#0a0a1a]/50 border border-white/5 rounded-xl hover:border-violet-500/30 hover:bg-violet-900/10 transition-all cursor-default"
                     >
                       <div
                         className={`text-xl text-slate-400 transition-all duration-300 group-hover/icon:${skill.color} group-hover/icon:scale-110`}
@@ -648,7 +594,7 @@ const StackSection = ({ language }: { language: Language }) => {
                         {skill.name}
                       </span>
 
-                      <div className="absolute inset-0 rounded-xl bg-rose-500/5 opacity-0 group-hover/icon:opacity-100 transition-opacity pointer-events-none" />
+                      <div className="absolute inset-0 rounded-xl bg-violet-500/5 opacity-0 group-hover/icon:opacity-100 transition-opacity pointer-events-none" />
                     </div>
                   ))}
                 </div>
@@ -670,7 +616,7 @@ const ProjectsSection = ({ language }: { language: Language }) => {
         <div>
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
             {t.sections.projectsTitle}{" "}
-            <span className="text-rose-500">
+            <span className="text-violet-500">
               {t.sections.projectsHighlight}
             </span>
           </h2>
@@ -682,7 +628,7 @@ const ProjectsSection = ({ language }: { language: Language }) => {
           href={portfolioData.social.github}
           target="_blank"
           rel="noreferrer"
-          className="flex items-center gap-2 text-rose-400 hover:text-white transition-colors"
+          className="flex items-center gap-2 text-violet-400 hover:text-white transition-colors"
           aria-label={t.sections.projectsGithubLink}
         >
           {t.sections.projectsGithubLink} <ExternalLink size={16} />
@@ -696,7 +642,7 @@ const ProjectsSection = ({ language }: { language: Language }) => {
           return (
             <GlassCard key={proj.id} className="group flex flex-col h-full">
               <div className="flex justify-between items-start mb-6">
-                <div className="p-3 bg-white/5 rounded-xl border border-white/10 group-hover:border-rose-500/30 transition-colors">
+                <div className="p-3 bg-white/5 rounded-xl border border-white/10 group-hover:border-violet-500/30 transition-colors">
                   {proj.icon}
                 </div>
                 <a
@@ -712,7 +658,7 @@ const ProjectsSection = ({ language }: { language: Language }) => {
                 </a>
               </div>
 
-              <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-rose-300 transition-colors">
+              <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-violet-300 transition-colors">
                 {projText.title}
               </h3>
               <p className="text-slate-400 text-sm leading-relaxed mb-6 flex-grow">
@@ -723,7 +669,7 @@ const ProjectsSection = ({ language }: { language: Language }) => {
                 {proj.tech.map((tTech, k) => (
                   <span
                     key={k}
-                    className="text-xs font-mono text-rose-200/80 bg-red-950/30 px-2 py-1 rounded"
+                    className="text-xs font-mono text-violet-300/80 bg-violet-900/20 px-2 py-1 rounded"
                   >
                     {tTech}
                   </span>
@@ -745,11 +691,12 @@ const AboutSection = ({ language }: { language: Language }) => {
   return (
     <Section id="about">
       <div className="grid lg:grid-cols-3 gap-12">
+        {/* Left Column: Bio */}
         <div className="lg:col-span-1 space-y-6">
           <h2 className="text-3xl font-bold text-white">
             {sections.aboutTitle}
           </h2>
-          <div className="w-16 h-1 bg-gradient-to-r from-red-600 to-rose-400 rounded-full" />
+          <div className="w-16 h-1 bg-gradient-to-r from-violet-500 to-cyan-500 rounded-full" />
 
           <p className="text-slate-400 leading-relaxed">
             {about.intro1Prefix}
@@ -763,9 +710,9 @@ const AboutSection = ({ language }: { language: Language }) => {
             {about.intro2}
           </p>
 
-          <GlassCard className="mt-8 !p-6 !bg-gradient-to-br from-red-900/20 to-transparent border-red-500/20">
+          <GlassCard className="mt-8 !p-6 !bg-gradient-to-br from-violet-900/20 to-transparent border-violet-500/20">
             <h4 className="flex items-center gap-2 text-white font-bold mb-2">
-              <Shield size={18} className="text-rose-400" />{" "}
+              <Shield size={18} className="text-emerald-400" />{" "}
               {sections.focusTitle}
             </h4>
             <p className="text-sm text-slate-400">
@@ -782,6 +729,7 @@ const AboutSection = ({ language }: { language: Language }) => {
           </GlassCard>
         </div>
 
+        {/* Right Column: Timeline */}
         <div className="lg:col-span-2">
           <h2 className="text-3xl font-bold text-white mb-8">
             {sections.journeyTitle}
@@ -790,11 +738,11 @@ const AboutSection = ({ language }: { language: Language }) => {
             {t.experience.map((exp, i) => (
               <div
                 key={i}
-                className="group relative pl-8 border-l border-white/10 hover:border-rose-500/50 transition-colors pb-2"
+                className="group relative pl-8 border-l border-white/10 hover:border-violet-500/50 transition-colors pb-2"
               >
-                <div className="absolute -left-[5px] top-2 w-2.5 h-2.5 rounded-full bg-slate-800 border border-slate-600 group-hover:bg-rose-500 group-hover:border-rose-400 transition-all shadow-[0_0_0_4px_rgba(3,0,20,1)]" />
+                <div className="absolute -left-[5px] top-2 w-2.5 h-2.5 rounded-full bg-slate-800 border border-slate-600 group-hover:bg-violet-500 group-hover:border-violet-400 transition-all shadow-[0_0_0_4px_rgba(3,0,20,1)]" />
 
-                <span className="text-xs font-mono text-rose-400 mb-1 block">
+                <span className="text-xs font-mono text-violet-400 mb-1 block">
                   {exp.year}
                 </span>
                 <h3 className="text-xl font-bold text-white">
@@ -862,14 +810,17 @@ export default function Portfolio() {
 
   const [language, setLanguage] = useState<Language>(() => {
     if (typeof window === "undefined") {
+      // SSR / durante build: fallback sicuro
       return "en";
     }
 
+    // 1) Prima scelta: ultima lingua salvata dall'utente
     const stored = window.localStorage.getItem("lang");
     if (stored === "it" || stored === "en") {
       return stored as Language;
     }
 
+    // 2) Se non c'è nulla in localStorage, usa lingua del browser
     const browserLang =
       navigator.language || (navigator.languages && navigator.languages[0]);
 
@@ -878,22 +829,24 @@ export default function Portfolio() {
       return code2 === "it" ? "it" : "en";
     }
 
+    // 3) Fallback finale
     return "en";
   });
 
+  // Sincronizza DOM + localStorage ogni volta che language cambia
   useEffect(() => {
     if (typeof window === "undefined") return;
     document.documentElement.lang = language;
     window.localStorage.setItem("lang", language);
   }, [language]);
 
+
   const handleToggleLanguage = () => {
     setLanguage((prev) => (prev === "it" ? "en" : "it"));
   };
 
   return (
-    <div className="min-h-screen bg-[#030014] text-slate-300 font-sans overflow-x-hidden selection:bg-red-500/30 selection:text-white">
-      <SnowOverlay />
+    <div className="min-h-screen bg-[#030014] text-slate-300 font-sans overflow-x-hidden selection:bg-violet-500/30 selection:text-white">
       <DynamicBackground />
       <Navbar language={language} onToggleLanguage={handleToggleLanguage} />
 
