@@ -23,6 +23,7 @@ import {
   Database,
   Layers,
   Globe,
+  Sigma,
 } from "lucide-react";
 
 import {
@@ -64,6 +65,7 @@ import type { Language } from "./i18n";
 const portfolioData = {
   name: "Massimo Fedrigo",
   location: "Cordenons, PN (Italy)",
+  piva: "01992250934",
   social: {
     github: "https://github.com/massimofedrigo",
     linkedin: "https://www.linkedin.com/in/massimo-fedrigo-33424228a/",
@@ -127,6 +129,12 @@ const projects = [
     icon: <Cpu className="text-pink-400" />,
     link: "https://overdiet.com",
     tech: ["PHP", "Symfony", "Javascript", "Node.js", "Vue.js", "Dart", "Flutter"],
+  },
+  {
+    id: "randomizedSVD" as const, // ID univoco
+    icon: <Sigma className="text-amber-400" />, 
+    link: "https://github.com/massimofedrigo/randomized-svd",
+    tech: ["Python", "NumPy", "Jupyter Notebook"],
   },
   {
     id: "stradella" as const,
@@ -769,34 +777,37 @@ const Footer = ({ language }: { language: Language }) => {
   return (
     <footer className="py-8 border-t border-white/5 bg-[#01010a] text-center mt-8">
       <div className="flex justify-center gap-6 mb-6" aria-label="Social links">
+        {/* ... icone social invariate ... */}
         <a
           href={portfolioData.social.github}
           className="text-slate-500 hover:text-white transition-colors"
-          aria-label={language === "it" ? "Profilo GitHub" : "GitHub profile"}
         >
           <Github size={20} />
         </a>
         <a
           href={portfolioData.social.linkedin}
           className="text-slate-500 hover:text-white transition-colors"
-          aria-label={
-            language === "it" ? "Profilo LinkedIn" : "LinkedIn profile"
-          }
         >
           <Linkedin size={20} />
         </a>
         <a
           href={portfolioData.social.mail}
           className="text-slate-500 hover:text-white transition-colors"
-          aria-label={language === "it" ? "Invia una email" : "Send an email"}
         >
           <Mail size={20} />
         </a>
       </div>
-      <p className="text-slate-600 text-xs font-mono">
-        © {new Date().getFullYear()} {portfolioData.name}.{" "}
-        {t.footer.builtWith}
-      </p>
+
+      <div className="text-slate-600 text-xs font-mono space-y-2">
+        <p>
+          © {new Date().getFullYear()} {portfolioData.name}
+          <span className="mx-2">•</span>
+          P.IVA {portfolioData.piva}
+        </p>
+        <p className="opacity-70">
+          {t.footer.builtWith}
+        </p>
+      </div>
     </footer>
   );
 };
