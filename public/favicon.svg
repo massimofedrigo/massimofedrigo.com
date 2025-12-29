@@ -1,9 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="16" fill="#030014"/>
-  
-  <rect x="2" y="2" width="60" height="60" rx="14" stroke="#8b5cf6" stroke-width="2" fill="none"/>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="terminalGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#a78bfa" /> <stop offset="50%" stop-color="#e879f9" /> <stop offset="100%" stop-color="#22d3ee" /> </linearGradient>
+  </defs>
 
-  <path d="M22 24 L14 32 L22 40" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M42 24 L50 32 L42 40" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <line x1="35" y1="16" x2="29" y2="48" stroke="#8b5cf6" stroke-width="5" stroke-linecap="round" />
+  <text x="50%" y="54%" 
+        font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace" 
+        font-weight="900" 
+        font-size="280" 
+        fill="url(#terminalGradient)" 
+        text-anchor="middle" 
+        dominant-baseline="central"
+        letter-spacing="-5">
+    &gt;MF
+  </text>
 </svg>

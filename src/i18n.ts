@@ -51,6 +51,7 @@ interface ProjectTexts {
 
 interface ProjectsTexts {
   overdiet: ProjectTexts;
+  randomizedSVD: ProjectTexts;
   stradella: ProjectTexts;
   syntheticPages: ProjectTexts;
   cyphermesh: ProjectTexts;
@@ -157,6 +158,10 @@ export const translations: Record<Language, I18nSchema> = {
       overdiet: {
         title: "Overdiet",
         desc: "Piattaforma Web & Mobile multi-utente per la gestione automatizzata di piani alimentari e protocolli nutrizionali, pensata per studi e professionisti del settore fitness.",
+      },
+      randomizedSVD: {
+        title: "Randomized SVD",
+        desc: "Libreria Python ad alte prestazioni per la Randomized SVD (rSVD), ottimizzata per grandi dataset.",
       },
       stradella: {
         title: "Stradella Fitness",
@@ -274,6 +279,10 @@ export const translations: Record<Language, I18nSchema> = {
       overdiet: {
         title: "Overdiet",
         desc: "Multi-user Web & Mobile platform for automated management of nutrition plans and protocols, designed for fitness professionals and studios.",
+      },
+      randomizedSVD: {
+        title: "Randomized SVD",
+        desc: "High-performance Python implementation of Randomized SVD (rSVD) optimized for large-scale datasets.",
       },
       stradella: {
         title: "Stradella Fitness",
