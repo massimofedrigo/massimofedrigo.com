@@ -708,15 +708,11 @@ const AboutSection = ({ language }: { language: Language }) => {
 
           <p className="text-slate-400 leading-relaxed">
             {about.intro1Prefix}
-            <span className="text-white">
-              {about.intro1Highlight}
-            </span>
+            <span className="text-white">{about.intro1Highlight}</span>
             {about.intro1Suffix}
           </p>
 
-          <p className="text-slate-400 leading-relaxed">
-            {about.intro2}
-          </p>
+          <p className="text-slate-400 leading-relaxed">{about.intro2}</p>
 
           <GlassCard className="mt-8 !p-6 !bg-gradient-to-br from-violet-900/20 to-transparent border-violet-500/20">
             <h4 className="flex items-center gap-2 text-white font-bold mb-2">
@@ -725,13 +721,9 @@ const AboutSection = ({ language }: { language: Language }) => {
             </h4>
             <p className="text-sm text-slate-400">
               {about.focus.prefix}
-              <strong className="text-white">
-                {about.focus.highlight1}
-              </strong>
+              <strong className="text-white">{about.focus.highlight1}</strong>
               {about.focus.middle}
-              <strong className="text-white">
-                {about.focus.highlight2}
-              </strong>
+              <strong className="text-white">{about.focus.highlight2}</strong>
               {about.focus.suffix}
             </p>
           </GlassCard>
@@ -743,27 +735,47 @@ const AboutSection = ({ language }: { language: Language }) => {
             {sections.journeyTitle}
           </h2>
           <div className="space-y-6">
-            {t.experience.map((exp, i) => (
-              <div
-                key={i}
-                className="group relative pl-8 border-l border-white/10 hover:border-violet-500/50 transition-colors pb-2"
-              >
-                <div className="absolute -left-[5px] top-2 w-2.5 h-2.5 rounded-full bg-slate-800 border border-slate-600 group-hover:bg-violet-500 group-hover:border-violet-400 transition-all shadow-[0_0_0_4px_rgba(3,0,20,1)]" />
+            {t.experience.map((exp, i) => {
+              const searchText = (exp.role + " " + exp.desc).toLowerCase();
+              const isThesis = searchText.includes("thesis") || searchText.includes("tesi");
 
-                <span className="text-xs font-mono text-violet-400 mb-1 block">
-                  {exp.year}
-                </span>
-                <h3 className="text-xl font-bold text-white">
-                  {exp.role}
-                </h3>
-                <div className="text-sm text-slate-500 font-medium mb-2">
-                  {exp.company}
+              const thesisLink =
+                language === "it" ? "/thesis_ita.pdf" : "/thesis_eng.pdf";
+
+              return (
+                <div
+                  key={i}
+                  className="group relative pl-8 border-l border-white/10 hover:border-violet-500/50 transition-colors pb-2"
+                >
+                  <div className="absolute -left-[5px] top-2 w-2.5 h-2.5 rounded-full bg-slate-800 border border-slate-600 group-hover:bg-violet-500 group-hover:border-violet-400 transition-all shadow-[0_0_0_4px_rgba(3,0,20,1)]" />
+
+                  <span className="text-xs font-mono text-violet-400 mb-1 block">
+                    {exp.year}
+                  </span>
+
+                  <h3 className="text-xl font-bold text-white flex flex-wrap items-center gap-3">
+                    {exp.role}
+                    
+                    {/* Bottone Tesi visibile solo se rilevato nel testo */}
+                    {isThesis && (
+                      <a
+                        href={thesisLink}
+                        download
+                        className="inline-flex items-center gap-2 px-3 py-1 bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold rounded-full hover:scale-105 transition-transform shadow-lg shadow-violet-900/20 whitespace-nowrap"
+                        title={language === "it" ? "Scarica Tesi" : "Download Thesis"}
+                      >
+                        <FileText size={14} /> PDF
+                      </a>
+                    )}
+                  </h3>
+
+                  <div className="text-sm text-slate-500 font-medium mb-2">
+                    {exp.company}
+                  </div>
+                  <p className="text-slate-400 text-sm max-w-xl">{exp.desc}</p>
                 </div>
-                <p className="text-slate-400 text-sm max-w-xl">
-                  {exp.desc}
-                </p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
